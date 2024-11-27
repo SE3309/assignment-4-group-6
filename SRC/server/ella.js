@@ -100,8 +100,6 @@ app.post("/register", async (req, res) => {
     }
 });
 
-  
-
 app.post("/insert-song", async (req, res) => {
     const {
         mediaID,
@@ -231,7 +229,6 @@ app.post("/insert-song-to-playlist", async (req, res) => {
     }
 });
 
-
 app.get("/playlist-songs/:PlaylistID", (req, res) => {
     const { PlaylistID } = req.params;
 
@@ -259,20 +256,20 @@ app.get("/playlist-songs/:PlaylistID", (req, res) => {
 
 
     db.query(query, [PlaylistID], (err, results) => {
-        if (err) {
-            console.error("Error fetching playlist songs:", err);
-            return res.status(500).json({ message: "Server error." });
-        }
+            if (err) {
+                console.error("Error fetching playlist songs:", err);
+                return res.status(500).json({ message: "Server error." });
+            }
 
-        if (results.length === 0) {
-            return res.status(404).json({ message: "No songs found for this playlist." });
-        }
+            if (results.length === 0) {
+                return res.status(404).json({ message: "No songs found for this playlist." });
+            }
 
-        res.status(200).json({
-            message: "Songs retrieved successfully.",
-            songs: results,
+            res.status(200).json({
+                message: "Songs retrieved successfully.",
+                songs: results,
+            });
         });
-    });
 });
 
 app.get("/stream/:MediaID", (req, res) => {
