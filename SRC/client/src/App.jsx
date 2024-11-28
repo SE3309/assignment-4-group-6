@@ -6,6 +6,7 @@ import Register from "./components/Register";
 import UserWelcomePage from "./components/UserWelcomePage"; // Adjust path as needed
 import UserHeader from "./components/UserHeader"; // Adjust path as needed
 import ArtistWelcomePage from './components/ArtistWelcomePage'
+import SearchArtist from "./components/SearchArtist";
 
 
 function App() {
@@ -18,7 +19,7 @@ function App() {
         <Route path="/UserWelcomePage" element={<UserWelcomePage />} /> {/* Add this line */}
         <Route path="/UserHeader" element={<UserHeader />} /> {/* Add this line */}
         <Route path="/Artist" element={<ArtistWelcomePage />} />
-
+        <Route path="/SearchArtist" element={<SearchArtist />} /> {/* Ensure this matches */}
       </Routes>
     </BrowserRouter>
   );
