@@ -2,7 +2,7 @@ const express = require("express");
 const mysql = require("mysql2");
 const bcrypt = require("bcryptjs");
 const bodyParser = require("body-parser");
-
+const jwt = require("jsonwebtoken");
 const app = express();
 app.use(bodyParser.json());
 
@@ -99,8 +99,6 @@ app.post("/register", async (req, res) => {
         res.status(500).json({ message: "Server error." });
     }
 });
-
-  
 
 app.post("/api/insert-song", async (req, res) => {
     const {
@@ -441,7 +439,6 @@ app.get("/api/search-song", (req, res) => {
 
     const queryParams = [];
 
-    // Add filters only if provided
     if (mediaName || artistName || albumID) {
         query += " WHERE 1 = 1";
 
@@ -461,18 +458,26 @@ app.get("/api/search-song", (req, res) => {
         }
     }
 
+    console.log("Executing SQL Query:", query);
+    console.log("Query Params:", queryParams);
+
     db.query(query, queryParams, (err, results) => {
         if (err) {
-            console.error("Error searching for songs:", err);
-            return res.status(500).json({ message: "Server error." });
+            console.error("Database Query Error:", err);
+            return res.status(500).json({ message: "Server error.", error: err });
         }
 
-        res.status(200).json({
-            message: "Songs retrieved successfully.",
-            songs: results,
-        });
+        if (results.length === 0) {
+            console.log("No songs found.");
+            return res.status(404).json({ message: "No songs found." });
+        }
+
+        console.log("Songs Retrieved:", results);
+        res.status(200).json({ message: "Songs retrieved successfully.", songs: results });
     });
 });
+
+  
 
 
 

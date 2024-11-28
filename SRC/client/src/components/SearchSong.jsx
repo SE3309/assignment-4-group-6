@@ -14,7 +14,7 @@ const SearchSong = () => {
   useEffect(() => {
     const fetchAllSongs = async () => {
       try {
-        const response = await axios.get("/api/search-song");
+        const response = await axios.get("/api/search-song"); // No need for full URL
         console.log("Fetched all songs:", response.data);
         setAllSongs(response.data.songs || []);
       } catch (err) {
@@ -22,6 +22,7 @@ const SearchSong = () => {
         setError("Unable to fetch all songs at the moment.");
       }
     };
+    
 
     fetchAllSongs();
   }, []);
