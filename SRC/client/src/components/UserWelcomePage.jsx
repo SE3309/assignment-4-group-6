@@ -1,17 +1,16 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import backgroundImage from "../img/back.png";
 
-
 const UserWelcomePage = () => {
-
   const styles = {
     page: {
       height: "100vh",
       width: "100vw",
       background: `
-      linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)), 
-      url(${backgroundImage})
-    `,
+        linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)), 
+        url(${backgroundImage})
+      `,
       backgroundSize: "cover",
       backgroundPosition: "center",
       display: "flex",
@@ -58,6 +57,7 @@ const UserWelcomePage = () => {
     welcomeTitle: {
       fontSize: "2rem",
       fontWeight: "bold",
+      marginBottom: "20px",
     },
     brandName: {
       fontSize: "2.5rem",
@@ -68,6 +68,26 @@ const UserWelcomePage = () => {
       backgroundColor: "#a5ff00",
       color: "black",
       padding: "5px 10px",
+    },
+    buttonContainer: {
+      marginTop: "20px",
+      display: "flex",
+      flexWrap: "wrap",
+      gap: "15px",
+      justifyContent: "center",
+    },
+    button: {
+      backgroundColor: "#a5ff00",
+      color: "black",
+      border: "none",
+      padding: "10px 20px",
+      fontSize: "1rem",
+      fontWeight: "bold",
+      cursor: "pointer",
+      borderRadius: "5px",
+      textDecoration: "none", // For Link styling
+      display: "inline-block",
+      transition: "background-color 0.3s ease",
     },
   };
 
@@ -97,11 +117,26 @@ const UserWelcomePage = () => {
 
       {/* Content Section */}
       <div style={styles.content}>
-      <div style={styles.brandName}>
+        <div style={styles.brandName}>
           <span style={styles.brandHighlight}>BRAT</span>music
         </div>
-        <div style={styles.welcomeTitle}>WELCOME TO YOUR USER PAGE</div>
-        
+        <div style={styles.welcomeTitle}>WELCOME TO YOUR USER PAGE!</div>
+
+        {/* Button Section */}
+        <div style={styles.buttonContainer}>
+          <Link to="/SearchArtist" style={styles.button}>
+            Go to Artists
+          </Link>
+          <Link to="/songs" style={styles.button}>
+            View Songs
+          </Link>
+          <Link to="/playlists" style={styles.button}>
+            View Playlists
+          </Link>
+          <Link to="/events" style={styles.button}>
+            View Event Calendar
+          </Link>
+        </div>
       </div>
     </div>
   );
