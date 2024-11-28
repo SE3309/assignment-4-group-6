@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "Omar824?",
+    password: "Shadowflash1",
     database: "BRATmusic",
 });
 
@@ -104,7 +104,7 @@ app.post("/register", async (req, res) => {
 
   
 
-app.post("/insert-song", async (req, res) => {
+app.post("/api/insert-song", async (req, res) => {
     const {
         mediaID,
         mediaName,
@@ -171,7 +171,7 @@ app.post("/insert-song", async (req, res) => {
     }
 });
 
-app.post("/insert-song-to-playlist", async (req, res) => {
+app.post("/api/insert-song-to-playlist", async (req, res) => {
     const { PlaylistID, MediaID, DateAdded, Description, Creator } = req.body;
 
     // Validate required fields
@@ -234,7 +234,7 @@ app.post("/insert-song-to-playlist", async (req, res) => {
 });
 
 
-app.get("/playlist-songs/:PlaylistID", (req, res) => {
+app.get("/api/playlist-songs/:PlaylistID", (req, res) => {
     const { PlaylistID } = req.params;
 
     // Validate that PlaylistID is provided
@@ -277,7 +277,7 @@ app.get("/playlist-songs/:PlaylistID", (req, res) => {
     });
 });
 
-app.get("/stream/:MediaID", (req, res) => {
+app.get("/api/stream/:MediaID", (req, res) => {
     const { MediaID } = req.params;
 
     if (!MediaID) {
@@ -316,7 +316,7 @@ app.get("/stream/:MediaID", (req, res) => {
     });
 });
 
-app.delete("/delete-song-from-playlist", (req, res) => {
+app.delete("/api/delete-song-from-playlist", (req, res) => {
     const { PlaylistID, MediaID, Creator } = req.body;
 
     // Validate required fields
@@ -374,7 +374,7 @@ app.delete("/delete-song-from-playlist", (req, res) => {
     }
 });
 
-app.delete("/delete-song-as-artist", (req, res) => {
+app.delete("/api/delete-song-as-artist", (req, res) => {
     const { MediaID, ArtistName } = req.body;
 
     // Validate required fields
@@ -426,7 +426,7 @@ app.delete("/delete-song-as-artist", (req, res) => {
     }
 });
 
-app.get("/search-song", (req, res) => {
+app.get("/api/search-song", (req, res) => {
     const { mediaName, artistName, albumID } = req.query;
 
     let query = `
@@ -439,35 +439,34 @@ app.get("/search-song", (req, res) => {
             mediaRanking,
             dateCreated
         FROM media
-        WHERE 1 = 1
     `;
 
     const queryParams = [];
 
-    if (mediaName) {
-        query += " AND mediaName LIKE ?";
-        queryParams.push(`%${mediaName}%`);
-    }
+    // Add filters only if provided
+    if (mediaName || artistName || albumID) {
+        query += " WHERE 1 = 1";
 
-    if (artistName) {
-        // Exact match with case insensitivity
-        query += " AND LOWER(artistName) = LOWER(?)";
-        queryParams.push(artistName);
-    }
+        if (mediaName) {
+            query += " AND mediaName LIKE ?";
+            queryParams.push(`%${mediaName}%`);
+        }
 
-    if (albumID) {
-        query += " AND albumID = ?";
-        queryParams.push(albumID);
+        if (artistName) {
+            query += " AND LOWER(artistName) = LOWER(?)";
+            queryParams.push(artistName);
+        }
+
+        if (albumID) {
+            query += " AND albumID = ?";
+            queryParams.push(albumID);
+        }
     }
 
     db.query(query, queryParams, (err, results) => {
         if (err) {
             console.error("Error searching for songs:", err);
             return res.status(500).json({ message: "Server error." });
-        }
-
-        if (results.length === 0) {
-            return res.status(404).json({ message: "No songs found." });
         }
 
         res.status(200).json({
@@ -477,7 +476,10 @@ app.get("/search-song", (req, res) => {
     });
 });
 
-app.post('/createPlaylist', (req, res) => {
+
+
+
+app.post('/api/createPlaylist', (req, res) => {
   const userId = req.body.userId; // User ID from the logged-in session or request
   const description = req.body.description; // Playlist description
   const mediaId = req.body.mediaId; // Media ID chosen by the user
@@ -528,7 +530,7 @@ app.post('/createPlaylist', (req, res) => {
   });
 });
 
-app.post('/createAlbum', (req, res) => {
+app.post('/api/createAlbum', (req, res) => {
   const artistName = req.body.artistName; // Simulating the logged-in artist
   const dateCreated = new Date().toISOString().split('T')[0]; // Today's date
 
@@ -568,7 +570,7 @@ app.post('/createAlbum', (req, res) => {
 });
 
 
-app.delete('/deleteAlbum/:albumID', (req, res) => {
+app.delete('/api/deleteAlbum/:albumID', (req, res) => {
   const albumID = req.params.albumID;
 
   // Check if the album exists
@@ -597,7 +599,7 @@ app.delete('/deleteAlbum/:albumID', (req, res) => {
 });
 
 // Delete a playlist by playlistID
-app.delete('/deletePlaylist/:playlistID', (req, res) => {
+app.delete('/api/deletePlaylist/:playlistID', (req, res) => {
   const playlistID = req.params.playlistID;
 
   // Check if the playlist exists
@@ -625,7 +627,7 @@ app.delete('/deletePlaylist/:playlistID', (req, res) => {
   });
 });
 
-app.get('/userInfo/:email', (req, res) => {
+app.get('/api/userInfo/:email', (req, res) => {
   const email = req.params.email; // Assume this comes from the logged-in user's session
 
   console.log('Received email:', email);
@@ -652,7 +654,7 @@ app.get('/userInfo/:email', (req, res) => {
   });
 });
 
-app.get('/artistInfo/:artistName', (req, res) => {
+app.get('/api/artistInfo/:artistName', (req, res) => {
   const artistName = req.params.artistName; // Assume this comes from the logged-in artist's session
 
   // Query to get artist details based on the actual table structure
@@ -677,7 +679,7 @@ app.get('/artistInfo/:artistName', (req, res) => {
   });
 });
 
-app.get('/albumInfo/:albumID', (req, res) => {
+app.get('/api/albumInfo/:albumID', (req, res) => {
   const albumID = req.params.albumID; // albumID provided in the request
 
   // Query to get album details
@@ -702,7 +704,7 @@ app.get('/albumInfo/:albumID', (req, res) => {
   });
 });
 
-app.get('/playlistInfo/:playlistID', (req, res) => {
+app.get('/api/playlistInfo/:playlistID', (req, res) => {
   const playlistID = req.params.playlistID; // PlaylistID provided in the request
 
   // Query to get playlist details including MediaIDs
@@ -762,7 +764,7 @@ console.log('Sample JWT Token:', token); // Log token to terminal
 
 // Login API with JWT
 // Login API using GET (not recommended)
-app.get('/login', (req, res) => {
+app.get('/api/login', (req, res) => {
     const { UserID, Password } = req.query; // Use query parameters for GET requests
   
     // Input validation
@@ -891,7 +893,7 @@ app.get("/api/artist", (req, res) => {
 
 // Login API with JWT
 // Login API using GET (not recommended)
-app.get('/login', (req, res) => {
+app.get('/api/login', (req, res) => {
    const { UserID, Password } = req.query; // Use query parameters for GET requests
     // Input validation
    if (!UserID || !Password) {
@@ -929,7 +931,7 @@ app.get('/login', (req, res) => {
    });
  });
   // Artist Login API using GET
-app.get('/artist-login', (req, res) => {
+app.get('/api/artist-login', (req, res) => {
  const { email, password } = req.query; // Extract email and password from query parameters
 
 
@@ -987,7 +989,7 @@ app.get('/artist-login', (req, res) => {
 
 /************************************************************************************************************
 *  End point to increment stream count for the user listening stats -SARAH ************************************************************************************************************/
-app.post('/increment-stream', (req, res) =>
+app.post('/api/increment-stream', (req, res) =>
     {
      const { userID, mediaID } = req.body;
     
@@ -1058,7 +1060,7 @@ app.post('/increment-stream', (req, res) =>
     
     /************************************************************************************************************
     *  End point to get listening stats for the user -SARAH ************************************************************************************************************/
-    app.get('/user-streams/:userID', (req, res) =>
+    app.get('/api/user-streams/:userID', (req, res) =>
     {
      const userID = req.params.userID;
     
@@ -1094,7 +1096,7 @@ app.post('/increment-stream', (req, res) =>
     
     /************************************************************************************************************
     *  End point to get a media's total streams -SARAH ************************************************************************************************************/
-    app.get('/total-streams/:mediaID', (req, res) =>
+    app.get('/api/total-streams/:mediaID', (req, res) =>
     {
      const mediaID = req.params.mediaID;
     
@@ -1135,7 +1137,7 @@ app.post('/increment-stream', (req, res) =>
     
     /************************************************************************************************************
     *  End point to get an artist's total streams -SARAH ************************************************************************************************************/
-    app.post('/artist-total-streams', (req, res) =>
+    app.post('/api/artist-total-streams', (req, res) =>
     {
      const { artistName } = req.body;
     
@@ -1192,7 +1194,7 @@ app.post('/increment-stream', (req, res) =>
     
     /************************************************************************************************************
     *  End point to get total revenue generated for artist -SARAH ************************************************************************************************************/
-    app.post('/calculate-revenue', (req, res) =>
+    app.post('/api/calculate-revenue', (req, res) =>
     {
      const { artistName } = req.body;
      const REVENUE_PER_STREAM = 0.45; // assumption = $0.45 per stream
