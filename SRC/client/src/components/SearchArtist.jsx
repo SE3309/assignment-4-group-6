@@ -43,20 +43,22 @@ const SearchArtist = () => {
 
   const styles = {
     page: {
-      height: "100vh",
-      width: "100vw",
-      background: `
-        linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)),
-        url(${backgroundImage})
-      `,
-      backgroundSize: "cover",
-      backgroundPosition: "center",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      color: "white",
-      padding: "20px",
-    },
+        minHeight: "100vh", // Ensure the background covers at least the viewport height
+        height: "auto", // Allow the content height to grow
+        width: "100vw",
+        background: `
+          linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)),
+          url(${backgroundImage})
+        `,
+        backgroundSize: "cover", // Make sure the background image scales properly
+        backgroundPosition: "center", // Center the image
+        backgroundAttachment: "fixed", // Fix the background in place
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        color: "white",
+        padding: "20px",
+      },
     searchContainer: {
       marginTop: "20px",
       width: "80%",
@@ -84,6 +86,7 @@ const SearchArtist = () => {
     results: {
       marginTop: "20px",
       textAlign: "center",
+      padding: "0 20px", // Add padding for better spacing
     },
     resultItem: {
       margin: "10px 0",
