@@ -9,6 +9,16 @@ body, html {
   color: white;
   background-color: #121212; /* Base background color */
 }
+/* App.css or global.css */
+body {
+  margin: 0; /* Remove default margin */
+  padding: 0; /* Remove default padding */
+}
+
+main {
+  padding-top: 60px; /* Adjust to the height of your header */
+}
+
 
 #root {
   width: 100%;

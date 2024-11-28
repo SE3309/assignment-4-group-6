@@ -3,12 +3,16 @@ import React from "react";
 const UserHeader = () => {
   const styles = {
     header: {
+      position: "fixed", // Keeps the header at the top
+      top: 0,
+      left: 0,
       width: "100%",
       backgroundColor: "black",
       display: "flex",
-      justifyContent: "space-between",
+      justifyContent: "space-between", // Space between logo and nav
       alignItems: "center",
-      padding: "20px 40px",
+      padding: "15px 30px",
+      zIndex: 1000, // Ensures the header stays above other content
     },
     logo: {
       fontSize: "1.5rem",
@@ -21,7 +25,9 @@ const UserHeader = () => {
     },
     nav: {
       display: "flex",
+      alignItems: "center",
       gap: "20px",
+      transform: "translateX(-50px)", // Move navigation further left
     },
     navLink: {
       fontSize: "1rem",
@@ -29,10 +35,16 @@ const UserHeader = () => {
       color: "white",
       textDecoration: "none",
     },
+    userIcon: {
+      borderRadius: "50%",
+      width: "30px",
+      height: "30px",
+      border: "2px solid #a5ff00",
+    },
   };
 
   return (
-    <div style={styles.header}>
+    <header style={styles.header}>
       <div style={styles.logo}>
         <span style={styles.logoHighlight}>BRAT</span>music
       </div>
@@ -49,9 +61,14 @@ const UserHeader = () => {
         <a href="/logout" style={styles.navLink}>
           sign out
         </a>
-        <span>👤</span> {/* User Icon */}
+        {/* User Profile Image */}
+        <img
+          src="https://via.placeholder.com/30"
+          alt="User Profile"
+          style={styles.userIcon}
+        />
       </nav>
-    </div>
+    </header>
   );
 };
 
