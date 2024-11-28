@@ -8,6 +8,9 @@ const jwt = require('jsonwebtoken'); // JWT for token generation
 const app = express();
 app.use(bodyParser.json());
 
+const cors = require('cors');
+app.use(cors());
+
 // Database connection
 const db = mysql.createConnection({
     host: "localhost",
