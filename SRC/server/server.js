@@ -2,8 +2,6 @@ const express = require("express");
 const mysql = require("mysql2");
 const bcrypt = require("bcryptjs");
 const bodyParser = require("body-parser");
-const jwt = require('jsonwebtoken'); // JWT for token generation
-
 
 const app = express();
 app.use(bodyParser.json());
@@ -12,7 +10,7 @@ app.use(bodyParser.json());
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "Shadowflash1",
+    password: "",
     database: "BRATmusic",
 });
 
