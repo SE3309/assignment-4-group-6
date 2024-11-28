@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
+import profileLogo from "../assets/greenProfileLogo.png"; // Adjust the path based on the file structure
 
 const UserHeader = () => {
+  const [hoveredLink, setHoveredLink] = useState(null);
+
   const styles = {
     header: {
       position: "fixed", // Keeps the header at the top
@@ -29,17 +32,16 @@ const UserHeader = () => {
       gap: "20px",
       transform: "translateX(-50px)", // Move navigation further left
     },
-    navLink: {
+    navLink: (isHovered) => ({
       fontSize: "1rem",
       textTransform: "capitalize",
-      color: "white",
+      color: isHovered ? "#9FFF00" : "white", // Green on hover, white otherwise
       textDecoration: "none",
-    },
+      transition: "color 0.3s ease", // Smooth hover effect
+    }),
     userIcon: {
-      borderRadius: "50%",
-      width: "30px",
-      height: "30px",
-      border: "2px solid #a5ff00",
+      width: "35px",
+      height: "35px",
     },
   };
 
@@ -49,21 +51,41 @@ const UserHeader = () => {
         <span style={styles.logoHighlight}>BRAT</span>music
       </div>
       <nav style={styles.nav}>
-        <a href="#artists" style={styles.navLink}>
+        <a
+          href="#artists"
+          style={styles.navLink(hoveredLink === "artists")}
+          onMouseEnter={() => setHoveredLink("artists")}
+          onMouseLeave={() => setHoveredLink(null)}
+        >
           artists
         </a>
-        <a href="#songs" style={styles.navLink}>
+        <a
+          href="#songs"
+          style={styles.navLink(hoveredLink === "songs")}
+          onMouseEnter={() => setHoveredLink("songs")}
+          onMouseLeave={() => setHoveredLink(null)}
+        >
           songs
         </a>
-        <a href="#playlists" style={styles.navLink}>
+        <a
+          href="#playlists"
+          style={styles.navLink(hoveredLink === "playlists")}
+          onMouseEnter={() => setHoveredLink("playlists")}
+          onMouseLeave={() => setHoveredLink(null)}
+        >
           playlists
         </a>
-        <a href="/logout" style={styles.navLink}>
+        <a
+          href="/logout"
+          style={styles.navLink(hoveredLink === "signout")}
+          onMouseEnter={() => setHoveredLink("signout")}
+          onMouseLeave={() => setHoveredLink(null)}
+        >
           sign out
         </a>
         {/* User Profile Image */}
         <img
-          src="https://via.placeholder.com/30"
+          src={profileLogo}
           alt="User Profile"
           style={styles.userIcon}
         />
@@ -73,3 +95,5 @@ const UserHeader = () => {
 };
 
 export default UserHeader;
+
+
