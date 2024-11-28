@@ -850,24 +850,39 @@ app.get("/api/playlists", (req, res) => {
 app.get("/api/artist", (req, res) => {
     const { artistName } = req.query;
 
-    if (!artistName) {
-        return res.status(400).json({ error: "artistName query parameter is required" });
+    if (artistName) {
+        console.log(`Searching for artist: ${artistName}`);
+        const query = "SELECT * FROM artist WHERE artistName LIKE ?";
+        db.query(query, [`%${artistName}%`], (err, results) => {
+            if (err) {
+                console.error("Error executing query:", err);
+                return res.status(500).json({ error: "Internal Server Error" });
+            }
+
+            if (results.length === 0) {
+                console.log("No artists found.");
+                return res.status(404).json({ message: "No artists found" });
+            }
+
+            console.log("Artists found:", results);
+            res.status(200).json(results);
+        });
+    } else {
+        console.log("Fetching all artists.");
+        const query = "SELECT * FROM artist";
+        db.query(query, (err, results) => {
+            if (err) {
+                console.error("Error executing query:", err);
+                return res.status(500).json({ error: "Internal Server Error" });
+            }
+
+            console.log("All artists:", results);
+            res.status(200).json(results);
+        });
     }
-
-    const query = "SELECT * FROM artist WHERE artistName LIKE ?";
-    db.query(query, [`%${artistName}%`], (err, results) => {
-        if (err) {
-            console.error("Error executing query:", err);
-            return res.status(500).json({ error: "Internal Server Error" });
-        }
-
-        if (results.length === 0) {
-            return res.status(404).json({ message: "No artists found" });
-        }
-
-        res.status(200).json(results);
-    });
 });
+
+
 
 
 // Start the server

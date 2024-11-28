@@ -4,6 +4,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import './App.css'
 import WelcomePage from './components/welcomePage'
 import ArtistWelcomePage from './components/ArtistWelcomePage'
+import SearchArtist from './components/SearchArtist'
+
 
 function App() {
   const [count, setCount] = useState(0)
@@ -13,6 +15,8 @@ function App() {
       <Routes>
         <Route path="/" element={<WelcomePage />} />
         <Route path="/Artist" element={<ArtistWelcomePage />} />
+        <Route path="/SearchArtist" element={<SearchArtist />} />
+
       </Routes>
     </BrowserRouter>
   )
