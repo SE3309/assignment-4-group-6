@@ -14,7 +14,7 @@ const JWT_SECRET = 'your-secret-key'; // Replace with a strong secret key
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: 'sarah070920',
+  password: 'Omar824?',
   database: 'BRATmusic',
   port: '3306'
 });
@@ -85,6 +85,59 @@ app.get('/login', (req, res) => {
     });
   });
   
+  // Artist Login API using GET
+app.get('/artist-login', (req, res) => {
+  const { email, password } = req.query; // Extract email and password from query parameters
+
+  // Input validation
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email and Password are required.' });
+  }
+
+  // Query to find artist by email in the artist table
+  const query = `SELECT * FROM artist WHERE email = ?`;
+  db.query(query, [email], (err, results) => {
+    if (err) {
+      console.error('Database query error:', err);
+      return res.status(500).json({ error: 'Database error.' });
+    }
+
+    // Check if artist exists
+    if (results.length === 0) {
+      return res.status(401).json({ error: 'Invalid Email or Password.' });
+    }
+
+    const artist = results[0];
+
+    // Validate password
+    if (password !== artist.password) {
+      return res.status(401).json({ error: 'Invalid Email or Password.' });
+    }
+
+    // Generate JWT for the artist
+    const token = jwt.sign(
+      { artistName: artist.artistName, email: artist.email, role: 'artist' },
+      JWT_SECRET // No expiration for the token
+    );
+
+    // Send the token and artist details back to the client
+    res.status(200).json({
+      message: 'Artist login successful.',
+      token: token,
+      artist: {
+        artistName: artist.artistName,
+        email: artist.email,
+        revenueGenerated: artist.revenueGenerated,
+        totalDurationListened: artist.totalDurationListened
+      }
+    });
+  });
+});
+
+
+  
+
+
 
 // Start the server
 app.listen(3001, () => {
