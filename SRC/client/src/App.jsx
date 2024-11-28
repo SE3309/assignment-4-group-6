@@ -9,10 +9,6 @@ import ArtistWelcomePage from './components/ArtistWelcomePage'
 import SearchArtist from './components/SearchArtist'
 import SearchSong from "./components/SearchSong";
 
-
-
-
-
 function App() {
   return (
     <BrowserRouter>
