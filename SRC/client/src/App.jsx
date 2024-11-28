@@ -1,21 +1,24 @@
-import { useState } from 'react'
-import React from 'react'
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import './App.css'
-import WelcomePage from './components/welcomePage'
-import ArtistWelcomePage from './components/ArtistWelcomePage'
+import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import WelcomePage from "./components/WelcomePage";
+import Login from "./components/Login";
+import Register from "./components/Register";
+import UserWelcomePage from "./components/UserWelcomePage"; // Adjust path as needed
+import UserHeader from "./components/UserHeader"; // Adjust path as needed
+
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<WelcomePage />} />
-        <Route path="/Artist" element={<ArtistWelcomePage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/UserWelcomePage" element={<UserWelcomePage />} /> {/* Add this line */}
+        <Route path="/UserHeader" element={<UserHeader />} /> {/* Add this line */}
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;
