@@ -1,14 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
+import profileLogo from "../assets/greenProfileLogo.png"; // Adjust the path based on the file structure
 
 const UserHeader = () => {
+  const [hoveredLink, setHoveredLink] = useState(null);
+
   const styles = {
     header: {
+      position: "fixed", // Keeps the header at the top
+      top: 0,
+      left: 0,
       width: "100%",
       backgroundColor: "black",
       display: "flex",
-      justifyContent: "space-between",
+      justifyContent: "space-between", // Space between logo and nav
       alignItems: "center",
-      padding: "20px 40px",
+      padding: "15px 30px",
+      zIndex: 1000, // Ensures the header stays above other content
     },
     logo: {
       fontSize: "1.5rem",
@@ -21,38 +28,72 @@ const UserHeader = () => {
     },
     nav: {
       display: "flex",
+      alignItems: "center",
       gap: "20px",
+      transform: "translateX(-50px)", // Move navigation further left
     },
-    navLink: {
+    navLink: (isHovered) => ({
       fontSize: "1rem",
       textTransform: "capitalize",
-      color: "white",
+      color: isHovered ? "#9FFF00" : "white", // Green on hover, white otherwise
       textDecoration: "none",
+      transition: "color 0.3s ease", // Smooth hover effect
+    }),
+    userIcon: {
+      width: "35px",
+      height: "35px",
     },
   };
 
   return (
-    <div style={styles.header}>
+    <header style={styles.header}>
       <div style={styles.logo}>
         <span style={styles.logoHighlight}>BRAT</span>music
       </div>
       <nav style={styles.nav}>
-        <a href="#artists" style={styles.navLink}>
+        <a
+          href="#artists"
+          style={styles.navLink(hoveredLink === "artists")}
+          onMouseEnter={() => setHoveredLink("artists")}
+          onMouseLeave={() => setHoveredLink(null)}
+        >
           artists
         </a>
-        <a href="#songs" style={styles.navLink}>
+        <a
+          href="#songs"
+          style={styles.navLink(hoveredLink === "songs")}
+          onMouseEnter={() => setHoveredLink("songs")}
+          onMouseLeave={() => setHoveredLink(null)}
+        >
           songs
         </a>
-        <a href="#playlists" style={styles.navLink}>
+        <a
+          href="#playlists"
+          style={styles.navLink(hoveredLink === "playlists")}
+          onMouseEnter={() => setHoveredLink("playlists")}
+          onMouseLeave={() => setHoveredLink(null)}
+        >
           playlists
         </a>
-        <a href="/logout" style={styles.navLink}>
+        <a
+          href="/logout"
+          style={styles.navLink(hoveredLink === "signout")}
+          onMouseEnter={() => setHoveredLink("signout")}
+          onMouseLeave={() => setHoveredLink(null)}
+        >
           sign out
         </a>
-        <span>👤</span> {/* User Icon */}
+        {/* User Profile Image */}
+        <img
+          src={profileLogo}
+          alt="User Profile"
+          style={styles.userIcon}
+        />
       </nav>
-    </div>
+    </header>
   );
 };
 
 export default UserHeader;
+
+

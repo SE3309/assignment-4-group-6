@@ -5,8 +5,7 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import UserWelcomePage from "./components/UserWelcomePage"; // Adjust path as needed
 import UserHeader from "./components/UserHeader"; // Adjust path as needed
-import SearchArtist from "./components/SearchArtist";
-
+import ArtistWelcomePage from './components/ArtistWelcomePage'
 
 
 function App() {
@@ -18,9 +17,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/UserWelcomePage" element={<UserWelcomePage />} /> {/* Add this line */}
         <Route path="/UserHeader" element={<UserHeader />} /> {/* Add this line */}
-        <Route path="/SearchArtist" element={<SearchArtist />} /> {/* Ensure this matches */}
-
-        
+        <Route path="/Artist" element={<ArtistWelcomePage />} />
 
       </Routes>
     </BrowserRouter>
