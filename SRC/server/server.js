@@ -1242,6 +1242,36 @@ app.post('/api/artist-revenue', (req, res) =>
     });
 });
 
+/************************************************************************************************************
+   *  End point to get artist name -SARAH ************************************************************************************************************/
+
+app.post('/api/get-artist-name', (req, res) =>
+{
+    const { email } = req.body;
+
+    if (!email)
+    {
+        return res.status(400).json({ error: 'Email is required.' });
+    }
+
+    const query = 'SELECT artistName FROM artist WHERE email = ?';
+
+    db.query(query, [email], (err, results) =>
+    {
+        if (err)
+        {
+            console.error('SQL Error:', err);
+            return res.status(500).json({ error: 'Database error', details: err.message });
+        }
+
+        if (results.length === 0)
+        {
+            return res.status(404).json({ error: 'Artist not found' });
+        }
+
+        res.json({ artistName: results[0].artistName });
+    });
+});
     /************************************************************************************************************
     *  End point to get total revenue generated for artist -SARAH ************************************************************************************************************/
     app.post('/api/calculate-revenue', (req, res) =>

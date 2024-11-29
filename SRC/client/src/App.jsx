@@ -13,6 +13,7 @@ import SearchPlaylist from "./components/SearchPlaylist";
 import ProfileSettings from "./components/ProfileSettings";
 import SearchAlbum from "./components/SearchAlbum";
 import ArtistRevenue from "./components/ArtistRevenue";
+import CreateAlbum from "./components/CreateAlbumMain";
 
 
 
@@ -35,6 +36,7 @@ function App()
         <Route path="/SearchAlbum" element={<SearchAlbum />} />
         <Route path="/ProfileSettings" element={<ProfileSettings />} />
         <Route path="/Revenue" element={<ArtistRevenue />} />
+        <Route path="/CreateAlbum" element={<CreateAlbum />} />
 
       </Routes>
     </BrowserRouter>
