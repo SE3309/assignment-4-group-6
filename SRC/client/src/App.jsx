@@ -1,17 +1,16 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import WelcomePage from "./components/WelcomePage";
-import UserWelcomePage from "./components/UserWelcomePage"; // Adjust path as needed
-import UserHeader from "./components/UserHeader"; // Adjust path as needed
-import ArtistWelcomePage from './components/ArtistWelcomePage'
-import SearchArtist from './components/SearchArtist'
+import UserWelcomePage from "./components/UserWelcomePage";
+import UserHeader from "./components/UserHeader";
+import ArtistWelcomePage from './components/ArtistWelcomePage';
+import SearchArtist from './components/SearchArtist';
 import SearchSong from "./components/SearchSong";
 import DisplayEvent from "./components/DisplayEvent";
 import CreateEvent from "./components/CreateEvent";
-import ProfileSettings from "./components/ProfileSettings";
 
-
-function App() {
+function App()
+{
   return (
     <BrowserRouter>
       <Routes>
@@ -22,9 +21,7 @@ function App() {
         <Route path="/SearchArtist" element={<SearchArtist />} />
         <Route path="/SearchSong" element={<SearchSong />} />
         <Route path="/DisplayEvent" element={<DisplayEvent />} /> 
-        <Route path="/CreateEvent" element={<CreateEvent />} />       
-        <Route path="/ProfileSettings" element={<ProfileSettings />} />       
-
+        <Route path="/CreateEvent" element={<CreateEvent />} />        
        
 
       </Routes>
