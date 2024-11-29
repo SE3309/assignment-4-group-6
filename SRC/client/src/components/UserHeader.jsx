@@ -32,6 +32,7 @@ const UserHeader = () => {
       display: "flex",
       alignItems: "center",
       gap: "20px",
+      transform: "translateX(-50px)",
     },
     navLink: (isHovered) => ({
       fontSize: "1rem",
