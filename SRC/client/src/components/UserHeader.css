@@ -1,0 +1,64 @@
+/* General Styling */
+body, a {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    text-decoration: none;
+  }
+  
+  body {
+    background-color: #1b1b1b;
+    color: #fff;
+  }
+  
+  /* Header Container */
+  .profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #111;
+    border-bottom: 2px solid #444;
+  }
+  
+  /* Logo Styling */
+  .brat-logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1ed760;
+  }
+  
+  .brat-logo span {
+    color: #fff;
+  }
+  
+  /* Navigation Links */
+  .profile-nav {
+    display: flex;
+    align-items: center;
+  }
+  
+  .profile-nav a {
+    margin-right: 20px;
+    font-size: 16px;
+    color: #fff;
+  }
+  
+  .profile-nav a:hover {
+    color: #1ed760;
+  }
+  
+  /* Profile Icon */
+  .profile-icon {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .user-icon {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #1ed760;
+  }
+  
