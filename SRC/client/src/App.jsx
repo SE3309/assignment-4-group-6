@@ -1,6 +1,5 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import WelcomePage from "./components/WelcomePage";
 import UserWelcomePage from "./components/UserWelcomePage";
 import UserHeader from "./components/UserHeader";
 import ArtistWelcomePage from './components/ArtistWelcomePage';
@@ -17,14 +16,14 @@ function App()
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<NewWelcomePage />} />
-        <Route path="/user-welcome" element={<UserWelcomePage />} />
-        <Route path="/user-header" element={<UserHeader />} />
-        <Route path="/artist" element={<ArtistWelcomePage />} />
-        <Route path="/search-artist" element={<SearchArtist />} />
-        <Route path="/search-song" element={<SearchSong />} />
-        <Route path="/display-event" element={<DisplayEvent />} />
-        <Route path="/create-event" element={<CreateEvent />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/UserWelcomePage" element={<UserWelcomePage />} />
+        <Route path="/UserHeader" element={<UserHeader />} />
+        <Route path="/ArtistWelcomePage" element={<ArtistWelcomePage />} />
+        <Route path="/SearchArtist" element={<SearchArtist />} />
+        <Route path="/SearchSong" element={<SearchSong />} />
+        <Route path="/DisplayEvent" element={<DisplayEvent />} />
+        <Route path="/CreateEvent" element={<CreateEvent />} />
+        <Route path="/Login" element={<Login />} />
         <Route path="/UserWelcomePage" element={<UserWelcomePage />} />
       </Routes>
     </BrowserRouter>
