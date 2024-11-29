@@ -12,6 +12,7 @@ import Login from "./components/Login";
 import SearchPlaylist from "./components/SearchPlaylist";
 import ProfileSettings from "./components/ProfileSettings";
 import SearchAlbum from "./components/SearchAlbum";
+import ArtistRevenue from "./components/ArtistRevenue";
 
 
 
@@ -30,10 +31,10 @@ function App()
         <Route path="/CreateEvent" element={<CreateEvent />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/UserWelcomePage" element={<UserWelcomePage />} />
-
         <Route path="/SearchPlaylist" element={<SearchPlaylist />} />
         <Route path="/SearchAlbum" element={<SearchAlbum />} />
         <Route path="/ProfileSettings" element={<ProfileSettings />} />
+        <Route path="/Revenue" element={<ArtistRevenue />} />
 
       </Routes>
     </BrowserRouter>

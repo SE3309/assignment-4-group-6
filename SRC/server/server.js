@@ -14,7 +14,7 @@ app.use(cors());
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "Rcgme03301!",
+    password: "sarah070920",
     database: "BRATmusic",
 });
 
@@ -1199,6 +1199,49 @@ app.post('/api/increment-stream', (req, res) =>
     });
     
     
+/************************************************************************************************************
+*  End point to get total revenue for artist from table-SARAH ************************************************************************************************************/
+
+
+app.post('/api/artist-revenue', (req, res) =>
+{
+    const { email } = req.body;
+
+    if (!email)
+    {
+        return res.status(400).json({
+            error: 'Artist email is required in request body'
+        });
+    }
+
+    const query = `
+    SELECT revenueGenerated 
+    FROM Artist 
+    WHERE email = ?
+  `;
+
+    db.query(query, [email], (err, results) =>
+    {
+        if (err)
+        {
+            console.error('Database query error:', err);
+            return res.status(500).json({
+                error: 'Error fetching artist revenue',
+                details: err.message
+            });
+        }
+
+        // If no results found, return 0
+        const revenue = results[0]?.revenueGenerated || 0;
+
+        res.json({
+            success: true,
+            email: email,
+            revenueGenerated: revenue
+        });
+    });
+});
+
     /************************************************************************************************************
     *  End point to get total revenue generated for artist -SARAH ************************************************************************************************************/
     app.post('/api/calculate-revenue', (req, res) =>
