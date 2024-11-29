@@ -12,6 +12,7 @@ import Login from "./components/Login";
 import SearchPlaylist from "./components/SearchPlaylist";
 
 
+
 function App()
 {
   return (
@@ -27,6 +28,7 @@ function App()
         <Route path="/CreateEvent" element={<CreateEvent />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/UserWelcomePage" element={<UserWelcomePage />} />
+
         <Route path="/SearchPlaylist" element={<SearchPlaylist />} />
 
       </Routes>

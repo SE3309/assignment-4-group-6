@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; // Add this import
 import Logo from '../assets/BMLogo.png';
 import profileLogo from '../assets/profileLogo.png';
 
@@ -57,10 +58,14 @@ const ArtistNavBar = () =>
             </div>
 
             <div style={navItemsStyle}>
-                <a href="#revenue" style={linkStyle}>revenue generated</a>
-                <a href="#albums" style={linkStyle}>albums</a>
-                <a href="#songs" style={linkStyle}>songs</a>
-                <a href="" style={linkStyle}><img src={profileLogo} alt="Profile" style={profileIconStyle} /></a>
+                <Link to="/login" style={linkStyle}>Revenue Generated</Link>
+                <Link to="/CreateAlbum" style={linkStyle}>Album</Link>
+                <Link to="/CreateSong" style={linkStyle}>Song</Link>
+                <Link to="/CreateEvent" style={linkStyle}>Event</Link>
+                <Link to="/" style={linkStyle}>Log out</Link>
+                <Link to="/profile" style={linkStyle}>
+                    <img src={profileLogo} alt="Profile" style={profileIconStyle} />
+                </Link>
             </div>
         </nav>
     );
