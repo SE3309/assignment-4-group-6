@@ -13,16 +13,16 @@ function App()
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<WelcomePage />} />
-        <Route path="/UserWelcomePage" element={<UserWelcomePage />} /> {/* Add this line */}
-        <Route path="/UserHeader" element={<UserHeader />} /> {/* Add this line */}
-        <Route path="/Artist" element={<ArtistWelcomePage />} />
-        <Route path="/SearchArtist" element={<SearchArtist />} />
-        <Route path="/SearchSong" element={<SearchSong />} />
-        <Route path="/DisplayEvent" element={<DisplayEvent />} /> 
-        <Route path="/CreateEvent" element={<CreateEvent />} />        
-       
-
+        <Route path="/" element={<NewWelcomePage />} />
+        <Route path="/user-welcome" element={<UserWelcomePage />} />
+        <Route path="/user-header" element={<UserHeader />} />
+        <Route path="/artist" element={<ArtistWelcomePage />} />
+        <Route path="/search-artist" element={<SearchArtist />} />
+        <Route path="/search-song" element={<SearchSong />} />
+        <Route path="/display-event" element={<DisplayEvent />} />
+        <Route path="/create-event" element={<CreateEvent />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/UserWelcomePage" element={<UserWelcomePage />} />
       </Routes>
     </BrowserRouter>
   );
