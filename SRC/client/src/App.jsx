@@ -7,6 +7,8 @@ import ArtistWelcomePage from './components/ArtistWelcomePage'
 import SearchArtist from './components/SearchArtist'
 import SearchSong from "./components/SearchSong";
 import DisplayEvent from "./components/DisplayEvent";
+import CreateEvent from "./components/CreateEvent";
+
 import ProfileSettings from './components/ProfileSettings'
 
 
@@ -22,6 +24,8 @@ function App() {
         <Route path="/Artist" element={<ArtistWelcomePage />} />
         <Route path="/SearchArtist" element={<SearchArtist />} />
         <Route path="/SearchSong" element={<SearchSong />} />
+        <Route path="/CreateEvent" element={<CreateEvent />} />        
+       
         <Route path="/DisplayEvent" element={<DisplayEvent />} />        
         <Route path="/ProfileSettings" element={<ProfileSettings />} />
 
