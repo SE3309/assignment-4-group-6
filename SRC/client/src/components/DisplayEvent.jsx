@@ -56,7 +56,8 @@ const DisplayEvent = () => {
         flexDirection: "column",
         alignItems: "center",
         color: "white",
-        padding: "20px",
+      padding: "20px",
+        marginTop: "65px",
     },
     searchContainer: {
       marginTop: "20px",
