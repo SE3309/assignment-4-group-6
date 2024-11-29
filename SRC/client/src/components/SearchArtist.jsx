@@ -3,6 +3,7 @@ import UserHeader from "./UserHeader";
 import axios from "axios";
 import backgroundImage from "../img/back.png";
 
+
 const SearchArtist = () => {
   const [query, setQuery] = useState(""); // State for search query
   const [artists, setArtists] = useState([]); // State for artist results
@@ -43,7 +44,7 @@ const SearchArtist = () => {
 
   const styles = {
     page: {
-        minHeight: "100vh", // Ensure the background covers at least the viewport height
+        minHeight: "80vh", // Ensure the background covers at least the viewport height
         height: "auto", // Allow the content height to grow
         width: "100vw",
         background: `

@@ -1,5 +1,7 @@
 const express = require('express');
 const mysql = require('mysql');
+const moment = require('moment');
+
 
 const app = express();
 app.use(express.json());
@@ -282,7 +284,108 @@ app.get('/playlistInfo/:playlistID', (req, res) => {
     });
 });
 
+app.use((req, res, next) => {
+    req.loggedInArtist = "exampleArtistName"; // Replace with the actual logged-in artist logic
+    next();
+});
 
+app.post("/api/createEvent", (req, res) => {
+    const { eventID, eventDate, eventTime, location } = req.body;
+    const artistName = req.body.artistName || req.loggedInArtist;
+
+    if (!artistName || !eventID || !eventDate || !eventTime || !location) {
+        return res.status(400).json({
+            error: "Missing required fields: eventID, artistName, eventDate, eventTime, or location",
+        });
+    }
+
+    // Check if eventID is unique
+    const checkEventQuery = `SELECT * FROM eventcalendar WHERE eventID = ?`;
+    db.query(checkEventQuery, [eventID], (err, result) => {
+        if (err) {
+            console.error("Error checking event ID:", err.message);
+            return res.status(500).json({ error: "Failed to validate event ID", details: err.message });
+        }
+
+        if (result.length > 0) {
+            return res.status(400).json({ error: "Event ID already exists. Please choose a different name." });
+        }
+
+        // Insert the new event if eventID is unique
+        const insertEventQuery = `
+            INSERT INTO eventcalendar (eventID, artistName, eventDate, eventTime, location) 
+            VALUES (?, ?, ?, ?, ?)
+        `;
+        console.log("SQL Query:", insertEventQuery);
+        console.log("Values:", [eventID, artistName, eventDate, eventTime, location]);
+
+        db.query(insertEventQuery, [eventID, artistName, eventDate, eventTime, location], (err, result) => {
+            if (err) {
+                console.error("Error inserting event:", err.message);
+                return res.status(500).json({ error: "Failed to create event", details: err.message });
+            }
+
+            res.status(201).json({
+                message: "Event created successfully",
+                eventID: eventID,
+            });
+        });
+    });
+});
+
+
+
+app.get("/api/events", (req, res) => {
+    const sql = `
+        SELECT eventID, artistName, eventDate, eventTime, location 
+        FROM eventcalendar
+    `;
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error("Error fetching events:", err);
+            return res.status(500).json({ error: "Failed to fetch events" });
+        }
+
+        // Format the eventDate to YYYY-MM-DD
+        const formattedResults = results.map(event => ({
+            ...event,
+            eventDate: moment(event.eventDate).format("YYYY-MM-DD"),
+        }));
+
+        res.status(200).json({
+            message: "Events retrieved successfully",
+            events: formattedResults,
+        });
+    });
+});
+
+app.get('/api/advertisement/:adId', (req, res) => {
+    const adId = req.params.adId;
+
+    // SQL query to fetch the company name and ad file
+    const sql = `SELECT company, adFile FROM advertisement WHERE adId = ?`;
+
+    db.query(sql, [adId], (err, results) => {
+        if (err) {
+            console.error('SQL Error:', err.message);
+            return res.status(500).json({ error: 'Failed to fetch advertisement details.', details: err.message });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: 'Advertisement not found.' });
+        }
+
+        // Retrieve the advertisement details
+        const advertisement = results[0];
+
+        // Send the advertisement response
+        res.status(200).json({
+            company: advertisement.company,
+            adFile: Buffer.from(advertisement.adFile).toString('base64'), // Send adFile as Base64 for playback
+        });
+    });
+});
 
 // Start the server
 app.listen(PORT, () => {
