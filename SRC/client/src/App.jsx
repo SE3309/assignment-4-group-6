@@ -1,6 +1,5 @@
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import WelcomePage from "./components/WelcomePage";
 import UserWelcomePage from "./components/UserWelcomePage";
 import UserHeader from "./components/UserHeader";
 import ArtistWelcomePage from './components/ArtistWelcomePage';
