@@ -1,44 +1,27 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom"; // Import Link from react-router-dom
-import Logo from '../assets/BMLogo.png';
 import profileLogo from "../assets/greenProfileLogo.png"; // Adjust the path based on the file structure
-
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import profileLogo from "../img/profileLogo.png"; // Replace with the actual path to your profile image
-import Logo from "../img/logo.png"; // Replace with the actual path to your logo
 
 const UserHeader = () => {
   const [hoveredLink, setHoveredLink] = useState(null);
 
   const styles = {
     header: {
-      position: "fixed",
+      position: "fixed", // Keeps the header at the top
       top: 0,
       left: 0,
       width: "100%",
       backgroundColor: "black",
       display: "flex",
-      justifyContent: "space-between",
+      justifyContent: "space-between", // Space between logo and nav
       alignItems: "center",
       padding: "15px 30px",
-      zIndex: 1000,
-      boxSizing: "border-box",
-    },
-    logoContainer: {
-      display: "flex",
-      alignItems: "center",
-      marginRight: "auto",
+      zIndex: 1000, // Ensures the header stays above other content
     },
     logo: {
-      height: "50px",
-      width: "auto",
-    },
-    logoText: {
       fontSize: "1.5rem",
       fontWeight: "bold",
       color: "white",
-      marginLeft: "10px",
     },
     logoHighlight: {
       backgroundColor: "#a5ff00",
@@ -49,43 +32,39 @@ const UserHeader = () => {
       display: "flex",
       alignItems: "center",
       gap: "20px",
+      transform: "translateX(-50px)",
     },
     navLink: (isHovered) => ({
       fontSize: "1rem",
       textTransform: "capitalize",
-      color: isHovered ? "#9FFF00" : "white",
+      color: isHovered ? "#9FFF00" : "white", // Green on hover, white otherwise
       textDecoration: "none",
-      transition: "color 0.3s ease",
+      transition: "color 0.3s ease", // Smooth hover effect
     }),
-    profileIcon: {
+    userIcon: {
       width: "35px",
       height: "35px",
-      borderRadius: "50%",
-      cursor: "pointer",
+      borderRadius: "50%", // Makes the image circular
+      cursor: "pointer", // Indicates it's clickable
     },
   };
 
   return (
     <header style={styles.header}>
-      {/* Logo Section */}
-      <div style={styles.logoContainer}>
-        <img src={Logo} alt="BRAT music logo" style={styles.logo} />
-        <div style={styles.logoText}>
-          <span style={styles.logoHighlight}>BRAT</span>music
-        </div>
+      {/* Logo */}
+      <div style={styles.logo}>
+        <span style={styles.logoHighlight}>BRAT</span>music
       </div>
 
       {/* Navigation Links */}
       <nav style={styles.nav}>
-        <Link to="/SearchAlbum" style={linkStyle}>Album</Link>
-
         <Link
           to="/SearchArtist"
           style={styles.navLink(hoveredLink === "artists")}
           onMouseEnter={() => setHoveredLink("artists")}
           onMouseLeave={() => setHoveredLink(null)}
         >
-          Artists
+          artists
         </Link>
         <Link
           to="/SearchSong"
@@ -93,7 +72,7 @@ const UserHeader = () => {
           onMouseEnter={() => setHoveredLink("songs")}
           onMouseLeave={() => setHoveredLink(null)}
         >
-          Songs
+          songs
         </Link>
         <Link
           to="/SearchPlaylist"
@@ -101,32 +80,32 @@ const UserHeader = () => {
           onMouseEnter={() => setHoveredLink("playlists")}
           onMouseLeave={() => setHoveredLink(null)}
         >
-          Playlists
+          playlists
         </Link>
         <Link
           to="/DisplayEvent"
-          style={styles.navLink(hoveredLink === "event")}
-          onMouseEnter={() => setHoveredLink("event")}
+          style={styles.navLink(hoveredLink === "Event")}
+          onMouseEnter={() => setHoveredLink("Event")}
           onMouseLeave={() => setHoveredLink(null)}
         >
-          Events
+          Event
         </Link>
         <Link
           to="/"
-          style={styles.navLink(hoveredLink === "logout")}
-          onMouseEnter={() => setHoveredLink("logout")}
+          style={styles.navLink(hoveredLink === "signout")}
+          onMouseEnter={() => setHoveredLink("signout")}
           onMouseLeave={() => setHoveredLink(null)}
         >
-          Log Out
+          sign out
         </Link>
 
-        {/* Profile Icon */}
+        {/* User Profile Image */}
         <Link to="/ProfileSettings">
-          <img
-            src={profileLogo}
-            alt="User Profile"
-            style={styles.profileIcon}
-          />
+        <img
+          src={profileLogo}
+          alt="User Profile"
+          style={styles.userIcon}
+        />
         </Link>
       </nav>
     </header>
@@ -134,4 +113,3 @@ const UserHeader = () => {
 };
 
 export default UserHeader;
-

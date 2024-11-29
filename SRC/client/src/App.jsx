@@ -10,7 +10,6 @@ import CreateEvent from "./components/CreateEvent";
 import NewWelcomePage from "./components/NewWelcomePage";
 import Login from "./components/Login";
 import SearchPlaylist from "./components/SearchPlaylist";
-
 import ProfileSettings from "./components/ProfileSettings";
 
 
