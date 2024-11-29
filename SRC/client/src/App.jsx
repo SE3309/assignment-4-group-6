@@ -12,7 +12,7 @@ import Login from "./components/Login";
 import SearchPlaylist from "./components/SearchPlaylist";
 import ProfileSettings from "./components/ProfileSettings";
 import SearchAlbum from "./components/SearchAlbum";
-
+import Register from "./components/Register";
 
 
 function App()
@@ -34,6 +34,7 @@ function App()
         <Route path="/SearchPlaylist" element={<SearchPlaylist />} />
         <Route path="/SearchAlbum" element={<SearchAlbum />} />
         <Route path="/ProfileSettings" element={<ProfileSettings />} />
+        <Route path="/register" element={<Register />} />
 
       </Routes>
     </BrowserRouter>

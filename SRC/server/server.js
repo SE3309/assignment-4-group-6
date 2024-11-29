@@ -14,7 +14,7 @@ app.use(cors());
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "Rcgme03301!",
+    password: "Omar824?",
     database: "BRATmusic",
 });
 
@@ -28,79 +28,206 @@ db.connect((err) => {
 
 // API endpoint to register a new user
 app.post("/register", async (req, res) => {
+    console.log("Received registration request:", req.body);
+   
     const {
         UserID,
         DisplayName,
-        StartDateOfSubscription,
         Password,
-        SubscriptionType,
-        PlaylistLibraryID,
+    } = req.body;
+ 
+ 
+    if (!UserID || !Password || !DisplayName) {
+        return res.status(400).json({
+            message: "UserID, Password, and DisplayName are required."
+        });
+    }
+ 
+ 
+    try {
+        // First check if user already exists
+        const checkUserQuery = "SELECT UserID FROM user WHERE UserID = ?";
+        db.query(checkUserQuery, [UserID], async (checkErr, checkResults) => {
+            if (checkErr) {
+                console.error("Error checking existing user:", checkErr);
+                return res.status(500).json({
+                    message: "Error checking user existence."
+                });
+            }
+ 
+ 
+            if (checkResults.length > 0) {
+                return res.status(409).json({
+                    message: "User already exists."
+                });
+            }
+ 
+ 
+            // Function to generate unique ID
+            const generateUniqueID = async () => {
+                let id;
+                let exists = true;
+                while (exists) {
+                    id = Math.floor(Math.random() * 1000000);
+                    const [rows] = await db.promise().query(
+                        'SELECT LibraryID FROM userplaylistlibrary WHERE LibraryID = ?',
+                        [id]
+                    );
+                    exists = rows.length > 0;
+                }
+                return id;
+            };
+ 
+ 
+            try {
+                // Generate unique IDs
+                const PlaylistLibraryID = await generateUniqueID();
+                const PlaylistID = await generateUniqueID();
+ 
+ 
+                // Use a transaction to ensure data consistency
+                await db.promise().beginTransaction();
+ 
+ 
+                // Insert into userplaylistlibrary
+                await db.promise().query(
+                    'INSERT INTO userplaylistlibrary (LibraryID, PlaylistID) VALUES (?, ?)',
+                    [PlaylistLibraryID, PlaylistID]
+                );
+ 
+ 
+                // Insert the user
+                await db.promise().query(
+                    'INSERT INTO user (UserID, DisplayName, Password, PlaylistLibraryID) VALUES (?, ?, ?, ?)',
+                    [UserID, DisplayName, Password, PlaylistLibraryID]
+                );
+ 
+ 
+                await db.promise().commit();
+ 
+ 
+                res.status(201).json({
+                    message: "User registered successfully",
+                    userId: UserID
+                });
+ 
+ 
+            } catch (transactionError) {
+                await db.promise().rollback();
+                console.error("Transaction error:", transactionError);
+                res.status(500).json({
+                    message: "Registration failed. Please try again."
+                });
+            }
+        });
+    } catch (error) {
+        console.error("Server error during registration:", error);
+        res.status(500).json({ message: "Server error." });
+    }
+ });
+
+ 
+
+
+   // API endpoint to register a new artist
+   app.post("/api/register-artist", async (req, res) => {
+    console.log("Received artist registration request:", req.body);  // Debug log
+   
+    const {
+        artistName,
+        email,
+        password,
+        totalDurationListenedTo = 0,
+        revenueGenerated = 0
     } = req.body;
 
-    if (!UserID || !Password || !DisplayName) {
-        return res
-            .status(400)
-            .json({ message: "UserID, Password, and DisplayName are required." });
+    // Input validation
+    if (!artistName || !email || !password) {
+        console.log("Missing required fields");  // Debug log
+        return res.status(400).json({
+            message: "artistName, email, and password are required fields."
+        });
     }
 
     try {
-        // Hash the password
-        const hashedPassword = await bcrypt.hash(Password, 10);
-
-        // Generate a default PlaylistID
-        const defaultPlaylistID = Math.floor(Math.random() * 1000000); // Example: Random ID
-
-        // Step 1: Insert into the userplaylistlibrary table
-        const insertPlaylistLibraryQuery = `
-            INSERT INTO userplaylistlibrary (LibraryID, PlaylistID)
-            VALUES (?, ?)
-        `;
-
-        db.query(
-            insertPlaylistLibraryQuery,
-            [PlaylistLibraryID, defaultPlaylistID],
-            (err, result) => {
-                if (err) {
-                    console.error("Error inserting into userplaylistlibrary:", err);
-                    return res
-                        .status(500)
-                        .json({ message: "Failed to create PlaylistLibraryID." });
-                }
-
-                // Step 2: Insert the user into the user table
-                const insertUserQuery = `
-                    INSERT INTO user (UserID, DisplayName, StartDateOfSubscription, Password, SubscriptionType, PlaylistLibraryID)
-                    VALUES (?, ?, ?, ?, ?, ?)
-                `;
-
-                db.query(
-                    insertUserQuery,
-                    [
-                        UserID,
-                        DisplayName,
-                        StartDateOfSubscription || null,
-                        hashedPassword,
-                        SubscriptionType || null,
-                        PlaylistLibraryID,
-                    ],
-                    (err, result) => {
-                        if (err) {
-                            console.error("Error inserting user:", err);
-                            return res
-                                .status(500)
-                                .json({ message: "Registration failed." });
-                        }
-
-                        res
-                            .status(201)
-                            .json({ message: "User registered successfully." });
-                    }
-                );
+        // Check if artist already exists
+        const checkArtistQuery = "SELECT * FROM artist WHERE artistName = ? OR email = ?";
+        db.query(checkArtistQuery, [artistName, email], async (err, results) => {
+            if (err) {
+                console.error("Database query error:", err);
+                return res.status(500).json({
+                    message: "Error checking artist existence.",
+                    error: err.message
+                });
             }
-        );
+
+            if (results.length > 0) {
+                console.log("Artist already exists");  // Debug log
+                return res.status(409).json({
+                    message: "Artist with this name or email already exists."
+                });
+            }
+
+            // Insert new artist
+            const insertQuery = `
+                INSERT INTO artist (
+                    artistName,
+                    totalDurationListenedTo,
+                    revenueGenerated,
+                    email,
+                    password
+                ) VALUES (?, ?, ?, ?, ?)
+            `;
+
+            db.query(
+                insertQuery,
+                [
+                    artistName,
+                    totalDurationListenedTo,
+                    revenueGenerated,
+                    email,
+                    password  // Store password directly
+                ],
+                (err, result) => {
+                    if (err) {
+                        console.error("Error registering artist:", err);
+                        return res.status(500).json({
+                            message: "Artist registration failed.",
+                            error: err.message
+                        });
+                    }
+
+                    console.log("Artist registered successfully");  // Debug log
+
+                    // Generate JWT token for the newly registered artist
+                    const token = jwt.sign(
+                        {
+                            artistName: artistName,
+                            email: email,
+                            role: 'artist'
+                        },
+                        JWT_SECRET
+                    );
+
+                    res.status(201).json({
+                        message: "Artist registered successfully.",
+                        token: token,
+                        artist: {
+                            artistName: artistName,
+                            email: email,
+                            totalDurationListenedTo: totalDurationListenedTo,
+                            revenueGenerated: revenueGenerated
+                        }
+                    });
+                }
+            );
+        });
     } catch (error) {
-        console.error("Error during registration:", error);
-        res.status(500).json({ message: "Server error." });
+        console.error("Error during artist registration:", error);
+        res.status(500).json({
+            message: "Server error during registration.",
+            error: error.message
+        });
     }
 });
 
