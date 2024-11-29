@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom"; // Import Link from react-router-dom
 import profileLogo from "../assets/greenProfileLogo.png"; // Adjust the path based on the file structure
 
 const UserHeader = () => {
@@ -20,6 +21,7 @@ const UserHeader = () => {
     logo: {
       fontSize: "1.5rem",
       fontWeight: "bold",
+      color: "white",
     },
     logoHighlight: {
       backgroundColor: "#a5ff00",
@@ -30,7 +32,6 @@ const UserHeader = () => {
       display: "flex",
       alignItems: "center",
       gap: "20px",
-      transform: "translateX(-50px)", // Move navigation further left
     },
     navLink: (isHovered) => ({
       fontSize: "1rem",
@@ -42,47 +43,53 @@ const UserHeader = () => {
     userIcon: {
       width: "35px",
       height: "35px",
+      borderRadius: "50%", // Makes the image circular
+      cursor: "pointer", // Indicates it's clickable
     },
   };
 
   return (
     <header style={styles.header}>
+      {/* Logo */}
       <div style={styles.logo}>
         <span style={styles.logoHighlight}>BRAT</span>music
       </div>
+
+      {/* Navigation Links */}
       <nav style={styles.nav}>
-        <a
-          href="#artists"
+        <Link
+          to="/SearchArtist"
           style={styles.navLink(hoveredLink === "artists")}
           onMouseEnter={() => setHoveredLink("artists")}
           onMouseLeave={() => setHoveredLink(null)}
         >
           artists
-        </a>
-        <a
-          href="#songs"
+        </Link>
+        <Link
+          to="/SearchSong"
           style={styles.navLink(hoveredLink === "songs")}
           onMouseEnter={() => setHoveredLink("songs")}
           onMouseLeave={() => setHoveredLink(null)}
         >
           songs
-        </a>
-        <a
-          href="#playlists"
+        </Link>
+        <Link
+          to="/playlists"
           style={styles.navLink(hoveredLink === "playlists")}
           onMouseEnter={() => setHoveredLink("playlists")}
           onMouseLeave={() => setHoveredLink(null)}
         >
           playlists
-        </a>
-        <a
-          href="/logout"
+        </Link>
+        <Link
+          to="/logout"
           style={styles.navLink(hoveredLink === "signout")}
           onMouseEnter={() => setHoveredLink("signout")}
           onMouseLeave={() => setHoveredLink(null)}
         >
           sign out
-        </a>
+        </Link>
+
         {/* User Profile Image */}
         <img
           src={profileLogo}
@@ -95,5 +102,3 @@ const UserHeader = () => {
 };
 
 export default UserHeader;
-
-
