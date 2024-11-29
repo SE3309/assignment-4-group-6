@@ -10,6 +10,7 @@ import CreateEvent from "./components/CreateEvent";
 import NewWelcomePage from "./components/NewWelcomePage";
 import Login from "./components/Login";
 
+
 function App()
 {
   return (
@@ -25,6 +26,7 @@ function App()
         <Route path="/CreateEvent" element={<CreateEvent />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/UserWelcomePage" element={<UserWelcomePage />} />
+
       </Routes>
     </BrowserRouter>
   );
