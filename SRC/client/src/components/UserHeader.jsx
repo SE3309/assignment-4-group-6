@@ -82,6 +82,14 @@ const UserHeader = () => {
           playlists
         </Link>
         <Link
+          to="/DisplayEvent"
+          style={styles.navLink(hoveredLink === "Event")}
+          onMouseEnter={() => setHoveredLink("Event")}
+          onMouseLeave={() => setHoveredLink(null)}
+        >
+          Event
+        </Link>
+        <Link
           to="/logout"
           style={styles.navLink(hoveredLink === "signout")}
           onMouseEnter={() => setHoveredLink("signout")}
