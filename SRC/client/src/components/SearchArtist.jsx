@@ -59,6 +59,7 @@ const SearchArtist = () => {
         alignItems: "center",
         color: "white",
         padding: "20px",
+        marginTop: "60px",
       },
     searchContainer: {
       marginTop: "20px",
