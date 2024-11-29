@@ -99,17 +99,17 @@ const UserWelcomePage = () => {
           <span style={styles.logoHighlight}>BRAT</span>music
         </div>
         <nav style={styles.nav}>
-          <a href="#artists" style={styles.navLink}>
-            artists
+          <a href="/SearchArtist" style={styles.navLink}>
+            Artist
           </a>
-          <a href="#songs" style={styles.navLink}>
-            songs
+          <a href="/SearchSong" style={styles.navLink}>
+            Song
           </a>
-          <a href="#playlists" style={styles.navLink}>
-            playlists
+          <a href="/SearchPlaylist" style={styles.navLink}>
+            Playlist
           </a>
-          <a href="/logout" style={styles.navLink}>
-            sign out
+          <a href="/" style={styles.navLink}>
+            Log Out
           </a>
           <span>👤</span> {/* User Icon */}
         </nav>
