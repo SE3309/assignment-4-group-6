@@ -85,7 +85,7 @@ function Login()
 
                     // Redirect to artist welcome page
 
-                    navigate('/Artist');
+                    navigate('/ArtistWelcomePage');
 
                 } else
                 {
