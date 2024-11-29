@@ -360,6 +360,8 @@ app.get("/api/events", (req, res) => {
     });
 });
 
+
+
 app.get('/api/advertisement/:adId', (req, res) => {
     const adId = req.params.adId;
 
