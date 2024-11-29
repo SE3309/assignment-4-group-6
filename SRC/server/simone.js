@@ -94,3 +94,73 @@ app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
 
+//API to edit user info
+app.put("/modify-user-info", async (req, res) => {
+    const {
+        UserID, // Required to identify the user
+        DisplayName,
+        Password,
+        SubscriptionType,
+    } = req.body;
+
+    // Ensure the UserID is provided (mandatory for updates)
+    if (!UserID) {
+        return res.status(400).json({ message: "UserID is required." });
+    }
+
+    // Initialize an array of fields to update dynamically
+    let updateFields = [];
+    let values = [];
+
+    if (DisplayName) {
+        updateFields.push("DisplayName = ?");
+        values.push(DisplayName);
+    }
+
+    if (Password) {
+        try {
+            const hashedPassword = await bcrypt.hash(Password, 10); // Hash the password
+            updateFields.push("Password = ?");
+            values.push(hashedPassword);
+        } catch (error) {
+            console.error("Error hashing password:", error);
+            return res.status(500).json({ message: "Error updating password." });
+        }
+    }
+
+    if (SubscriptionType) {
+        updateFields.push("SubscriptionType = ?");
+        values.push(SubscriptionType);
+    }
+
+    if (updateFields.length === 0) {
+        return res
+            .status(400)
+            .json({ message: "No fields to update were provided." });
+    }
+
+    // Add UserID to the values array for the WHERE clause
+    values.push(UserID);
+
+    const updateQuery = `
+        UPDATE user
+        SET ${updateFields.join(", ")}
+        WHERE UserID = ?
+    `;
+
+    // Execute the query
+    db.query(updateQuery, values, (err, result) => {
+        if (err) {
+            console.error("Error updating user info:", err);
+            return res
+                .status(500)
+                .json({ message: "Error updating user information." });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "User not found." });
+        }
+
+        res.status(200).json({ message: "User information updated successfully." });
+    });
+});
