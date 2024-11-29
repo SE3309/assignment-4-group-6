@@ -6,6 +6,7 @@ import UserHeader from "./components/UserHeader"; // Adjust path as needed
 import ArtistWelcomePage from './components/ArtistWelcomePage'
 import SearchArtist from './components/SearchArtist'
 import SearchSong from "./components/SearchSong";
+import DisplayEvent from "./components/DisplayEvent";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/Artist" element={<ArtistWelcomePage />} />
         <Route path="/SearchArtist" element={<SearchArtist />} />
         <Route path="/SearchSong" element={<SearchSong />} />
+        <Route path="/DisplayEvent" element={<DisplayEvent />} />        
 
       </Routes>
     </BrowserRouter>
