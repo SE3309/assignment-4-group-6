@@ -100,11 +100,13 @@ const UserHeader = () => {
         </Link>
 
         {/* User Profile Image */}
-        <img
-          src={profileLogo}
-          alt="User Profile"
-          style={styles.userIcon}
-        />
+        <Link to="/ProfileSettings">
+          <img
+            src={profileLogo}
+            alt="User Profile"
+            style={styles.userIcon}
+          />
+        </Link>
       </nav>
     </header>
   );

@@ -9,6 +9,8 @@ import DisplayEvent from "./components/DisplayEvent";
 import CreateEvent from "./components/CreateEvent";
 import NewWelcomePage from "./components/NewWelcomePage";
 import Login from "./components/Login";
+import ProfileSettings from "./components/ProfileSettings";
+
 
 function App()
 {
@@ -25,6 +27,8 @@ function App()
         <Route path="/CreateEvent" element={<CreateEvent />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/UserWelcomePage" element={<UserWelcomePage />} />
+        <Route path="/ProfileSettings" element={<ProfileSettings />} />
+
       </Routes>
     </BrowserRouter>
   );
