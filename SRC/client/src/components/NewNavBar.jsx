@@ -60,7 +60,7 @@ const NewNavBar = () =>
             <div style={navItemsStyle}>
                 <Link to="/login" style={linkStyle}>log in</Link>
                 <Link to="/register" style={linkStyle}>register</Link>
-                <Link to="/profile" style={linkStyle}>
+                <Link to="/" style={linkStyle}>
                     <img src={profileLogo} alt="Profile" style={profileIconStyle} />
                 </Link>
             </div>
