@@ -58,7 +58,6 @@ const UserHeader = () =>
               </div>
   
               <div style={navItemsStyle}>
-                  <Link to="/login" style={linkStyle}>Revenue Generated</Link>
                   <Link to="/SearchAlbum" style={linkStyle}>Album</Link>
                   <Link to="/SearchSong" style={linkStyle}>Song</Link>
                   <Link to="/SearchArtist" style={linkStyle}>Artist</Link>
