@@ -1464,6 +1464,72 @@ app.post('/api/increment-stream', (req, res) =>
         });
     });
 
+    app.get('/api/media/details/:albumID', (req, res) => {
+        const albumID = req.params.albumID;
+        const query = `
+            SELECT 
+                mediaID,
+                mediaName,
+                dateCreated,
+                lengthOfMedia,
+                mediaRanking,
+                totalDurationListenedTo
+            FROM media
+            WHERE albumID = ?
+            ORDER BY mediaName
+        `;
+    
+        db.query(query, [albumID], (err, results) => {
+            if (err) {
+                console.error('SQL Error:', err.message);
+                return res.status(500).json({ 
+                    error: 'Failed to retrieve media details.',
+                    details: err.message 
+                });
+            }
+    
+            const formattedResults = results.map(media => ({
+                mediaID: media.mediaID,
+                mediaName: media.mediaName,
+                dateCreated: media.dateCreated,
+                lengthOfMedia: media.lengthOfMedia,
+                mediaRanking: media.mediaRanking,
+                totalDurationListenedTo: media.totalDurationListenedTo
+            }));
+    
+            res.status(200).json({
+                message: 'Media details retrieved successfully.',
+                media: formattedResults
+            });
+        });
+    });
+
+    app.get('/api/albums/details', (req, res) => {
+        const query = `
+            SELECT 
+                albumID,
+                artistName,
+                dateCreated
+            FROM album
+            ORDER BY dateCreated DESC
+        `;
+    
+        db.query(query, (err, results) => {
+            if (err) {
+                console.error('SQL Error:', err.message);
+                return res.status(500).json({ 
+                    error: 'Failed to retrieve album details.',
+                    details: err.message 
+                });
+            }
+    
+            res.status(200).json({
+                message: 'Albums retrieved successfully.',
+                albums: results
+            });
+        });
+    });
+
 // Start the server
 const PORT = 3000;
 app.listen(PORT, () => {

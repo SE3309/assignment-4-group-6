@@ -11,6 +11,8 @@ import NewWelcomePage from "./components/NewWelcomePage";
 import Login from "./components/Login";
 import SearchPlaylist from "./components/SearchPlaylist";
 import ProfileSettings from "./components/ProfileSettings";
+import SearchAlbum from "./components/SearchAlbum";
+
 
 
 function App()
@@ -30,7 +32,7 @@ function App()
         <Route path="/UserWelcomePage" element={<UserWelcomePage />} />
 
         <Route path="/SearchPlaylist" element={<SearchPlaylist />} />
-
+        <Route path="/SearchAlbum" element={<SearchAlbum />} />
         <Route path="/ProfileSettings" element={<ProfileSettings />} />
 
       </Routes>

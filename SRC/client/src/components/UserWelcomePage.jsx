@@ -110,13 +110,16 @@ const UserWelcomePage = () => {
           <Link to="/SearchArtist" style={styles.button}>
             Go to Artists
           </Link>
-          <Link to="/songs" style={styles.button}>
+          <Link to="/SearchSong" style={styles.button}>
             View Songs
           </Link>
-          <Link to="/playlists" style={styles.button}>
+          <Link to="/SearchAlbum" style={styles.button}>
+            View Albums
+          </Link>
+          <Link to="/SearchPlaylist" style={styles.button}>
             View Playlists
           </Link>
-          <Link to="/events" style={styles.button}>
+          <Link to="/DisplayEvent" style={styles.button}>
             View Event Calendar
           </Link>
         </div>
