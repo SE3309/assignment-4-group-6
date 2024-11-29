@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import backgroundImage from "../img/back.png";
+import UserHeader from "./UserHeader";
 
 const UserWelcomePage = () => {
   const styles = {
@@ -18,6 +19,7 @@ const UserWelcomePage = () => {
       justifyContent: "space-between",
       alignItems: "center",
       color: "white",
+      overflow: "hidden", // Prevent scrolling
     },
     header: {
       width: "100%",
@@ -25,7 +27,7 @@ const UserWelcomePage = () => {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      padding: "20px 40px",
+      padding: "10px 20px",
     },
     logo: {
       fontSize: "1.5rem",
@@ -36,13 +38,7 @@ const UserWelcomePage = () => {
       color: "black",
       padding: "5px",
     },
-    nav: {
-      display: "flex",
-      gap: "20px",
-    },
     navLink: {
-      fontSize: "1rem",
-      textTransform: "capitalize",
       color: "white",
       textDecoration: "none",
     },
@@ -53,16 +49,17 @@ const UserWelcomePage = () => {
       justifyContent: "center",
       alignItems: "center",
       textAlign: "center",
+      padding: "20px",
     },
     welcomeTitle: {
       fontSize: "2rem",
       fontWeight: "bold",
-      marginBottom: "20px",
+      marginBottom: "10px",
     },
     brandName: {
       fontSize: "2.5rem",
       fontWeight: "bold",
-      margin: "10px 0",
+      marginBottom: "10px",
     },
     brandHighlight: {
       backgroundColor: "#a5ff00",
@@ -73,19 +70,19 @@ const UserWelcomePage = () => {
       marginTop: "20px",
       display: "flex",
       flexWrap: "wrap",
-      gap: "15px",
+      gap: "10px",
       justifyContent: "center",
     },
     button: {
       backgroundColor: "#a5ff00",
       color: "black",
       border: "none",
-      padding: "10px 20px",
+      padding: "10px 15px",
       fontSize: "1rem",
       fontWeight: "bold",
       cursor: "pointer",
       borderRadius: "5px",
-      textDecoration: "none", // For Link styling
+      textDecoration: "none",
       display: "inline-block",
       transition: "background-color 0.3s ease",
     },
@@ -98,21 +95,7 @@ const UserWelcomePage = () => {
         <div style={styles.logo}>
           <span style={styles.logoHighlight}>BRAT</span>music
         </div>
-        <nav style={styles.nav}>
-          <a href="#artists" style={styles.navLink}>
-            artists
-          </a>
-          <a href="#songs" style={styles.navLink}>
-            songs
-          </a>
-          <a href="#playlists" style={styles.navLink}>
-            playlists
-          </a>
-          <a href="/logout" style={styles.navLink}>
-            sign out
-          </a>
-          <span>👤</span> {/* User Icon */}
-        </nav>
+        <UserHeader />
       </div>
 
       {/* Content Section */}
