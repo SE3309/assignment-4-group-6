@@ -31,7 +31,7 @@ const SearchSong = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.get("/search-song", {
+      const response = await axios.get("/api/search-song", {
         params: {
           mediaName,
           artistName,
