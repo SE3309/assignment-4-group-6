@@ -27,6 +27,7 @@ function App()
         <Route path="/CreateEvent" element={<CreateEvent />} />
         <Route path="/Login" element={<Login />} />
         <Route path="/UserWelcomePage" element={<UserWelcomePage />} />
+
         <Route path="/ProfileSettings" element={<ProfileSettings />} />
 
       </Routes>

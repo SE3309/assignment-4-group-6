@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom"; // Import Link from react-router-dom
+import Logo from '../assets/BMLogo.png';
 import profileLogo from "../assets/greenProfileLogo.png"; // Adjust the path based on the file structure
 
 const UserHeader = () => {
