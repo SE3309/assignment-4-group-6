@@ -1,11 +1,17 @@
 import React from 'react';
 import Logo from '../assets/BMLogo.png';
 import NewNavBar from './NewNavBar';
+import backgroundImage from "../img/back.png";
+
 
 const NewWelcomePage = () =>
 {
     const styles = {
         container: {
+            background: `
+        linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.7)),
+        url(${backgroundImage})
+      `,
             width: '100vw',
             height: '100vh',
             backgroundColor: '#1a1a1a',
