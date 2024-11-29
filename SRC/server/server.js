@@ -7,11 +7,14 @@ const app = express();
 app.use(bodyParser.json());
 const moment = require('moment');
 
+const cors = require('cors');
+app.use(cors());
+
 // Database connection
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "Shadowflash1",
+    password: "sarah070920",
     database: "BRATmusic",
 });
 
