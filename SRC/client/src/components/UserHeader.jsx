@@ -60,6 +60,7 @@ const UserHeader = () =>
               <div style={navItemsStyle}>
                   <Link to="/SearchAlbum" style={linkStyle}>Album</Link>
                   <Link to="/SearchSong" style={linkStyle}>Song</Link>
+                  <Link to="/SearchPlaylist" style={linkStyle}>Playlist</Link>
                   <Link to="/SearchArtist" style={linkStyle}>Artist</Link>
                   <Link to="/DisplayEvent" style={linkStyle}>Event</Link>
                   <Link to="/ProfileSettings" style={linkStyle}>Settings</Link>                 
