@@ -74,6 +74,10 @@ const UserHeader = () => {
         >
           songs
         </Link>
+
+        <Link to="/SearchAlbum" style={styles.button}>
+            View Albums
+          </Link>
         <Link
           to="/SearchPlaylist"
           style={styles.navLink(hoveredLink === "playlists")}

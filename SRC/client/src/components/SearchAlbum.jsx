@@ -47,7 +47,8 @@ const SearchAlbum = () => {
       setFilteredAlbums(albums);
     } else {
       const filtered = albums.filter(album =>
-        album.artistName.toLowerCase().includes(searchTerm.toLowerCase())
+        album.artistName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        album.albumName.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredAlbums(filtered);
     }
@@ -137,6 +138,11 @@ const SearchAlbum = () => {
       textAlign: "center",
       color: "#A1A1AA",
       marginTop: "20px",
+    },
+    albumName: {
+      fontSize: "1.2rem",
+      color: "#9FFF00",
+      marginBottom: "10px",
     }
   };
 
@@ -145,12 +151,11 @@ const SearchAlbum = () => {
       <UserHeader />
       <input
         type="text"
-        placeholder="Search by album name..."
+        placeholder="Search by album or artist name..."
         style={styles.searchInput}
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-
       <div style={styles.contentContainer}>
         <div style={styles.albumsSection}>
           <h2 style={styles.title}>Albums</h2>
@@ -163,7 +168,8 @@ const SearchAlbum = () => {
               }}
               onClick={() => handleAlbumClick(album)}
             >
-              <h3 style={styles.title}>{album.artistName}</h3>
+              <h3 style={styles.albumName}>{album.albumName}</h3> {/* Display the album name */}
+              <p style={styles.detail}>Artist: {album.artistName}</p>
               <p style={styles.detail}>Album ID: {album.albumID}</p>
               <p style={styles.detail}>
                 Created: {new Date(album.dateCreated).toLocaleDateString()}
@@ -172,9 +178,10 @@ const SearchAlbum = () => {
           ))}
         </div>
 
+        {/* Show Media Section when an album is selected */}
         {selectedAlbum && (
           <div style={styles.mediaSection}>
-            <h2 style={styles.title}>Songs in {selectedAlbum.artistName}'s Album</h2>
+            <h2 style={styles.title}>Songs in {selectedAlbum.albumName}</h2>
             {mediaDetails.length > 0 ? (
               mediaDetails.map((media) => (
                 <div key={media.mediaID} style={styles.mediaCard}>

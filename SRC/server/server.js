@@ -369,6 +369,7 @@ app.get("/api/playlist-songs/:PlaylistID", (req, res) => {
         return res.status(400).json({ message: "PlaylistID is required." });
     }
 
+
     // SQL query to fetch songs of a playlist
     const query = `
     SELECT 
@@ -609,60 +610,109 @@ app.get("/api/search-song", (req, res) => {
 });
 
   
-
+app.get('/api/user-playlists', (req, res) => {
+    const userId = req.query.userId;
+  
+    if (!userId) {
+      return res.status(400).json({
+        error: "User ID is required.",
+      });
+    }
+  
+    const query = `SELECT * FROM playlist WHERE Creator = ?`;
+  
+    db.query(query, [userId], (err, results) => {
+      if (err) {
+        console.error("SQL Error:", err.message);
+        return res.status(500).json({
+          error: "Failed to fetch playlists.",
+        });
+      }
+  
+      res.status(200).json({
+        playlists: results,
+      });
+    });
+  });
+  
+  
 
 
 
 app.post('/api/createPlaylist', (req, res) => {
-  const userId = req.body.userId; // User ID from the logged-in session or request
-  const description = req.body.description; // Playlist description
-  const mediaId = req.body.mediaId; // Media ID chosen by the user
+    const userId = req.body.userId; // User ID from the logged-in session or request
+    const description = req.body.description; // Playlist description
+    const mediaId = req.body.mediaId || null; // Media ID is optional, default to null if not provided
+  
+    // Validate input
+    if (!userId || !description) {
+        return res.status(400).json({
+            error: 'User ID and description are required.',
+        });
+    }
+  
+    // Current date for 'DateAdded'
+    const dateAdded = new Date().toISOString().split('T')[0];
+  
+    // If mediaId is provided, check if it exists in the 'media' table
+    if (mediaId) {
+        const checkMediaQuery = `SELECT * FROM media WHERE MediaID = ?`;
+        db.query(checkMediaQuery, [mediaId], (err, mediaResult) => {
+            if (err) {
+                console.error('SQL Error:', err.message);
+                return res.status(500).json({
+                    error: 'Failed to verify Media ID.',
+                    details: err.message,
+                });
+            }
+  
+            if (mediaResult.length === 0) {
+                return res.status(400).json({
+                    error: 'Invalid Media ID. Please choose a valid media.',
+                });
+            }
+  
+            // Insert the playlist with the valid MediaID
+            const insertPlaylistQuery = `
+                INSERT INTO playlist (PlaylistID, Creator, DateAdded, Description) 
+                VALUES (DEFAULT, ?, ?, ?)
+                `;
+                db.query(insertPlaylistQuery, [userId, dateAdded, description], (err, result) => {
+                if (err) {
+                    console.error('SQL Error:', err.message);
+                    return res.status(500).json({
+                    error: 'Failed to create playlist.',
+                    details: err.message,
+                    });
+                }
 
-  // Validate input
-  if (!userId || !description || !mediaId) {
-      return res.status(400).json({
-          error: 'User ID, description, and Media ID are required.',
-      });
-  }
+                res.status(200).json({
+                    message: 'Playlist created successfully!',
+                    playlistId: result.insertId,
+                });
+                });
 
-  // Current date for 'DateAdded'
-  const dateAdded = new Date().toISOString().split('T')[0];
-
-  // Check if the provided MediaID exists in the 'media' table
-  const checkMediaQuery = `SELECT * FROM media WHERE MediaID = ?`;
-  db.query(checkMediaQuery, [mediaId], (err, mediaResult) => {
-      if (err) {
-          console.error('SQL Error:', err.message);
-          return res.status(500).json({
-              error: 'Failed to verify Media ID.',
-              details: err.message,
-          });
-      }
-
-      if (mediaResult.length === 0) {
-          return res.status(400).json({
-              error: 'Invalid Media ID. Please choose a valid media.',
-          });
-      }
-
-      // Insert the playlist with the valid MediaID
-      const insertPlaylistQuery = `INSERT INTO playlist (Creator, DateAdded, Description, MediaID) VALUES (?, ?, ?, ?)`;
-      db.query(insertPlaylistQuery, [userId, dateAdded, description, mediaId], (err, result) => {
-          if (err) {
-              console.error('SQL Error:', err.message);
-              return res.status(500).json({
-                  error: 'Failed to create playlist.',
-                  details: err.message,
-              });
-          }
-
-          res.status(200).json({
-              message: 'Playlist created successfully!',
-              playlistId: result.insertId,
-          });
-      });
+        });
+    } else {
+        // Insert the playlist without MediaID
+        const insertPlaylistQuery = `INSERT INTO playlist (Creator, DateAdded, Description) VALUES (?, ?, ?)`;
+        db.query(insertPlaylistQuery, [userId, dateAdded, description], (err, result) => {
+            if (err) {
+                console.error('SQL Error:', err.message);
+                return res.status(500).json({
+                    error: 'Failed to create playlist.',
+                    details: err.message,
+                });
+            }
+  
+            res.status(200).json({
+                message: 'Playlist created successfully!',
+                playlistId: result.insertId,
+            });
+        });
+    }
   });
-});
+  
 
 app.post('/api/createAlbum', (req, res) => {
   const artistName = req.body.artistName; // Simulating the logged-in artist
@@ -992,6 +1042,56 @@ app.get("/api/playlists", (req, res) => {
         res.status(200).json(results); // Ensure response is returned only once
     });
 });
+
+app.get("/api/artist-details/:artistName", (req, res) => {
+    const { artistName } = req.params;
+
+    if (!artistName) {
+        return res.status(400).json({ message: "Artist name is required." });
+    }
+
+    const queryAlbums = `SELECT * FROM albums WHERE artistName = ?`;
+    const queryPlaylists = `SELECT * FROM playlists WHERE artistName = ?`;
+    const querySongs = `SELECT * FROM songs WHERE artistName = ?`;
+
+    // Fetch data from the database
+    const fetchData = async () => {
+        try {
+            const albums = await new Promise((resolve, reject) => {
+                db.query(queryAlbums, [artistName], (err, results) => {
+                    if (err) reject(err);
+                    resolve(results);
+                });
+            });
+
+            const playlists = await new Promise((resolve, reject) => {
+                db.query(queryPlaylists, [artistName], (err, results) => {
+                    if (err) reject(err);
+                    resolve(results);
+                });
+            });
+
+            const songs = await new Promise((resolve, reject) => {
+                db.query(querySongs, [artistName], (err, results) => {
+                    if (err) reject(err);
+                    resolve(results);
+                });
+            });
+
+            res.json({ albums, playlists, songs });
+        } catch (err) {
+            console.error("Error fetching artist details:", err);
+            res.status(500).json({ message: "Internal Server Error." });
+        }
+    };
+
+    fetchData();
+});
+
+
+
+
+
 
 
 // Endpoint to search for an artist by artistName
@@ -1720,6 +1820,7 @@ app.post('/api/get-artist-name', (req, res) =>
             SELECT 
                 albumID,
                 artistName,
+                albumName,
                 dateCreated
             FROM album
             ORDER BY dateCreated DESC
@@ -1740,6 +1841,79 @@ app.post('/api/get-artist-name', (req, res) =>
             });
         });
     });
+
+
+    app.get('/api/albums/:artistName', (req, res) => {
+        const { artistName } = req.params;
+        console.log("Received artistName:", artistName);
+    
+        const query = `
+            SELECT albumID, albumName, dateCreated, artistName
+            FROM album
+            WHERE artistName = ?
+            ORDER BY dateCreated
+        `;
+    
+        db.query(query, [artistName], (err, results) => {
+            if (err) {
+                console.error('SQL Error:', err.message);
+                return res.status(500).json({ error: 'Failed to retrieve albums.', details: err.message });
+            }
+    
+            console.log("Query results:", results);
+            if (results.length === 0) {
+                return res.status(404).json({ message: 'No albums found for this artist.' });
+            }
+    
+            res.status(200).json({
+                message: 'Albums retrieved successfully.',
+                albums: results,
+            });
+        });
+    });
+    
+    
+    // API to get all playlists for a user
+app.get('/api/userPlaylists', (req, res) => {
+    const userId = req.query.userId;  // Get the User ID from query parameters
+  
+    // Input validation
+    if (!userId) {
+      return res.status(400).json({
+        error: 'User ID is required.',
+      });
+    }
+  
+    // Query to get playlists created by the user from the 'playlist' table
+    const query = `SELECT * FROM playlist WHERE Creator = ?`;
+    
+    db.query(query, [userId], (err, results) => {
+      if (err) {
+        console.error('SQL Error:', err.message);
+        return res.status(500).json({
+          error: 'Failed to fetch playlists.',
+          details: err.message,
+        });
+      }
+  
+      if (results.length === 0) {
+        return res.status(404).json({
+          message: 'No playlists found for this user.',
+        });
+      }
+  
+      // Return the list of playlists
+      res.status(200).json({
+        message: 'Playlists fetched successfully.',
+        playlists: results,
+      });
+    });
+  });
+  
+    
+    
+    
+    
 
 // Start the server
 const PORT = 3000;

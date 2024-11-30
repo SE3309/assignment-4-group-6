@@ -10,12 +10,14 @@ import CreateEvent from "./components/CreateEvent";
 import NewWelcomePage from "./components/NewWelcomePage";
 import Login from "./components/Login";
 import SearchPlaylist from "./components/SearchPlaylist";
-import ProfileSettings from "./components/ProfileSettings";
 import SearchAlbum from "./components/SearchAlbum";
+
+import ProfileSettings from "./components/ProfileSettings";
+
 import ArtistRevenue from "./components/ArtistRevenue";
 import CreateAlbum from "./components/CreateAlbumMain";
-import Register from "./components/Register";
 
+import Register from "./components/Register";
 
 function App()
 {
