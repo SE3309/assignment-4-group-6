@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import UserHeader from "./UserHeader";
 import backgroundImage from "../img/back.png";
+import UserHeader from './UserHeader';
+
 
 const SearchPlaylists = () => {
   const [playlists, setPlaylists] = useState([]);
@@ -9,8 +10,7 @@ const SearchPlaylists = () => {
   const [newPlaylist, setNewPlaylist] = useState({ description: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
-  const [inputValue, setInputValue] = useState(''); // Initial value is an empty string
-
+  const [inputValue, setInputValue] = useState("");
 
   // Fetch playlists on component mount
   useEffect(() => {
@@ -26,30 +26,39 @@ const SearchPlaylists = () => {
   const fetchPlaylists = async () => {
     try {
       const token = localStorage.getItem("token");
-      const userId = "ellaharding"; // Replace with the actual user ID
-  
+      const storedUser = localStorage.getItem("user");
+
       if (!token) {
         throw new Error("No authentication token found");
       }
-  
+      if (!storedUser) {
+        throw new Error("No user information found in localStorage.");
+      }
+
+      const parsedUser = JSON.parse(storedUser);
+      const userId = parsedUser.UserID;
+
+      console.log("Fetching playlists for user:", userId);
+
       const response = await fetch(`/api/user-playlists?userId=${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
-  
+
       const data = await response.json();
+      console.log("Fetched playlists:", data);
+
       setPlaylists(data.playlists || []);
       setFilteredPlaylists(data.playlists || []);
     } catch (error) {
       console.error("Error fetching playlists:", error);
     }
   };
-  
   
   
 
@@ -64,6 +73,7 @@ const SearchPlaylists = () => {
       setIsLoading(true);
   
       const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId"); // Example: Fetch userId from local storage or a global state
       if (!token) {
         throw new Error("No authentication token found");
       }
