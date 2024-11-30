@@ -985,6 +985,56 @@ app.get("/api/playlists", (req, res) => {
     });
 });
 
+app.get("/api/artist-details/:artistName", (req, res) => {
+    const { artistName } = req.params;
+
+    if (!artistName) {
+        return res.status(400).json({ message: "Artist name is required." });
+    }
+
+    const queryAlbums = `SELECT * FROM albums WHERE artistName = ?`;
+    const queryPlaylists = `SELECT * FROM playlists WHERE artistName = ?`;
+    const querySongs = `SELECT * FROM songs WHERE artistName = ?`;
+
+    // Fetch data from the database
+    const fetchData = async () => {
+        try {
+            const albums = await new Promise((resolve, reject) => {
+                db.query(queryAlbums, [artistName], (err, results) => {
+                    if (err) reject(err);
+                    resolve(results);
+                });
+            });
+
+            const playlists = await new Promise((resolve, reject) => {
+                db.query(queryPlaylists, [artistName], (err, results) => {
+                    if (err) reject(err);
+                    resolve(results);
+                });
+            });
+
+            const songs = await new Promise((resolve, reject) => {
+                db.query(querySongs, [artistName], (err, results) => {
+                    if (err) reject(err);
+                    resolve(results);
+                });
+            });
+
+            res.json({ albums, playlists, songs });
+        } catch (err) {
+            console.error("Error fetching artist details:", err);
+            res.status(500).json({ message: "Internal Server Error." });
+        }
+    };
+
+    fetchData();
+});
+
+
+
+
+
+
 
 // Endpoint to search for an artist by artistName
 app.get("/api/artist", (req, res) => {
@@ -1711,6 +1761,7 @@ app.post('/api/get-artist-name', (req, res) =>
             SELECT 
                 albumID,
                 artistName,
+                albumName,
                 dateCreated
             FROM album
             ORDER BY dateCreated DESC
@@ -1731,6 +1782,43 @@ app.post('/api/get-artist-name', (req, res) =>
             });
         });
     });
+
+
+    app.get('/api/albums/:artistName', (req, res) => {
+        const { artistName } = req.params;
+        console.log("Received artistName:", artistName);
+    
+        const query = `
+            SELECT albumID, albumName, dateCreated, artistName
+            FROM album
+            WHERE artistName = ?
+            ORDER BY dateCreated
+        `;
+    
+        db.query(query, [artistName], (err, results) => {
+            if (err) {
+                console.error('SQL Error:', err.message);
+                return res.status(500).json({ error: 'Failed to retrieve albums.', details: err.message });
+            }
+    
+            console.log("Query results:", results);
+            if (results.length === 0) {
+                return res.status(404).json({ message: 'No albums found for this artist.' });
+            }
+    
+            res.status(200).json({
+                message: 'Albums retrieved successfully.',
+                albums: results,
+            });
+        });
+    });
+    
+    
+    
+    
+    
+    
+    
 
 // Start the server
 const PORT = 3000;

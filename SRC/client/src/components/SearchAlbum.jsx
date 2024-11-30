@@ -1,18 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import UserHeader from './UserHeader';
 import backgroundImage from "../img/back.png";
+
 const SearchAlbum = () => {
   const [albums, setAlbums] = useState([]);
   const [mediaDetails, setMediaDetails] = useState([]);
   const [selectedAlbum, setSelectedAlbum] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredAlbums, setFilteredAlbums] = useState([]);
+
   useEffect(() => {
     fetchAlbums();
   }, []);
+
   useEffect(() => {
     filterAlbums();
   }, [searchTerm, albums]);
+
   const fetchAlbums = async () => {
     try {
       const response = await fetch('/api/albums/details');
@@ -25,6 +29,7 @@ const SearchAlbum = () => {
       console.error('Error fetching albums:', error);
     }
   };
+
   const fetchMediaDetails = async (albumId) => {
     try {
       const response = await fetch(`/api/media/details/${albumId}`);
@@ -36,16 +41,19 @@ const SearchAlbum = () => {
       console.error('Error fetching media details:', error);
     }
   };
+
   const filterAlbums = () => {
     if (searchTerm === '') {
       setFilteredAlbums(albums);
     } else {
       const filtered = albums.filter(album =>
-        album.artistName.toLowerCase().includes(searchTerm.toLowerCase())
+        album.artistName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        album.albumName.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredAlbums(filtered);
     }
   };
+
   const handleAlbumClick = async (album) => {
     if (selectedAlbum?.albumID === album.albumID) {
       setSelectedAlbum(null);
@@ -55,6 +63,7 @@ const SearchAlbum = () => {
       await fetchMediaDetails(album.albumID);
     }
   };
+
   const styles = {
     page: {
       minHeight: "100vh",
@@ -129,14 +138,20 @@ const SearchAlbum = () => {
       textAlign: "center",
       color: "#A1A1AA",
       marginTop: "20px",
+    },
+    albumName: {
+      fontSize: "1.2rem",
+      color: "#9FFF00",
+      marginBottom: "10px",
     }
   };
+
   return (
     <div style={styles.page}>
       <UserHeader />
       <input
         type="text"
-        placeholder="Search by album name..."
+        placeholder="Search by album or artist name..."
         style={styles.searchInput}
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
@@ -153,7 +168,8 @@ const SearchAlbum = () => {
               }}
               onClick={() => handleAlbumClick(album)}
             >
-              <h3 style={styles.title}>{album.artistName}</h3>
+              <h3 style={styles.albumName}>{album.albumName}</h3> {/* Display the album name */}
+              <p style={styles.detail}>Artist: {album.artistName}</p>
               <p style={styles.detail}>Album ID: {album.albumID}</p>
               <p style={styles.detail}>
                 Created: {new Date(album.dateCreated).toLocaleDateString()}
@@ -161,9 +177,11 @@ const SearchAlbum = () => {
             </div>
           ))}
         </div>
+
+        {/* Show Media Section when an album is selected */}
         {selectedAlbum && (
           <div style={styles.mediaSection}>
-            <h2 style={styles.title}>Songs in {selectedAlbum.artistName}'s Album</h2>
+            <h2 style={styles.title}>Songs in {selectedAlbum.albumName}</h2>
             {mediaDetails.length > 0 ? (
               mediaDetails.map((media) => (
                 <div key={media.mediaID} style={styles.mediaCard}>
@@ -184,4 +202,5 @@ const SearchAlbum = () => {
     </div>
   );
 };
+
 export default SearchAlbum;
