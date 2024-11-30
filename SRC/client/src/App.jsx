@@ -12,7 +12,6 @@ import Login from "./components/Login";
 import SearchPlaylist from "./components/SearchPlaylist";
 import SearchAlbum from "./components/SearchAlbum";
 import ProfileSettings from "./components/ProfileSettings";
-import SearchAlbum from "./components/SearchAlbum";
 import Register from "./components/Register";
 
 function App()
