@@ -9,6 +9,8 @@ const SearchPlaylists = () => {
   const [newPlaylist, setNewPlaylist] = useState({ description: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [inputValue, setInputValue] = useState(''); // Initial value is an empty string
+
 
   // Fetch playlists on component mount
   useEffect(() => {
@@ -53,18 +55,19 @@ const SearchPlaylists = () => {
 
   // Create a new playlist
   const handleCreatePlaylist = async () => {
-    if (!newPlaylist.description) {
-      alert("Please provide a description for the playlist.");
+    if (!newPlaylist.name || !newPlaylist.description) {
+      alert("Please provide both a name and description for the playlist.");
       return;
     }
-
+  
     try {
       setIsLoading(true);
+  
       const token = localStorage.getItem("token");
       if (!token) {
         throw new Error("No authentication token found");
       }
-
+  
       const response = await fetch("/api/createPlaylist", {
         method: "POST",
         headers: {
@@ -72,26 +75,32 @@ const SearchPlaylists = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          userId: "ellaharding", // Replace with actual logged-in user ID
           description: newPlaylist.description,
+          mediaId: newPlaylist.mediaId || null, // Optional
         }),
       });
-
-      const data = await response.json();
-      if (response.ok) {
-        setSuccessMessage(data.message);
-        fetchPlaylists(); // Refresh the playlists after creation
-        setNewPlaylist({ description: "" }); // Clear the input
-        setTimeout(() => setSuccessMessage(""), 3000); // Clear success message after 3 seconds
-      } else {
-        alert(data.error || "Failed to create playlist.");
+  
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({})); // Catch invalid JSON
+        throw new Error(errorData.error || "Failed to create playlist");
       }
-      setIsLoading(false);
+  
+      const data = await response.json(); // Parse JSON response
+      setSuccessMessage(data.message);
+      fetchPlaylists(); // Refresh playlists after creation
+      setNewPlaylist({ name: "", description: "", mediaId: "" }); // Clear inputs
+      setTimeout(() => setSuccessMessage(""), 3000); // Clear success message after 3 seconds
     } catch (error) {
-      console.error("Error creating playlist:", error);
+      console.error("Error creating playlist:", error.message);
+      alert(error.message); // Show error message to the user
+    } finally {
       setIsLoading(false);
     }
   };
+  
+  
+  
+  
 
   // Filter playlists based on search term
   const filterPlaylists = () => {
@@ -206,6 +215,15 @@ const SearchPlaylists = () => {
         <h2>Create New Playlist</h2>
         <input
           type="text"
+          placeholder="Playlist Name"
+          style={styles.newPlaylistInput}
+          value={newPlaylist.name}
+          onChange={(e) =>
+            setNewPlaylist({ ...newPlaylist, name: e.target.value })
+          }
+        />
+        <input
+          type="text"
           placeholder="Playlist Description"
           style={styles.newPlaylistInput}
           value={newPlaylist.description}
@@ -220,20 +238,20 @@ const SearchPlaylists = () => {
 
       {/* Display Playlists */}
       {isLoading ? (
-        <p>Loading...</p>
-      ) : filteredPlaylists.length > 0 ? (
-        filteredPlaylists.map((playlist) => (
-          <div key={playlist.PlaylistID} style={styles.playlistItem}>
-            <h3>{playlist.PlaylistName || "Untitled Playlist"}</h3>
-            <p>Created: {new Date(playlist.CreationDate).toLocaleDateString()}</p>
-          </div>
-        ))
-      ) : (
-        <p style={styles.noPlaylists}>
-          {searchTerm
-            ? "No playlists match your search."
-            : "You haven't created any playlists yet."}
-        </p>
+  <p>Loading...</p>
+) : filteredPlaylists.length > 0 ? (
+  filteredPlaylists.map((playlist) => (
+    <div key={playlist.PlaylistID} style={styles.playlistItem}>
+      <h3>{playlist.Description || "Untitled Playlist"}</h3> {/* Use 'Description' for name */}
+      <p>Created: {new Date(playlist.DateAdded).toLocaleDateString()}</p> {/* Use 'DateAdded' for creation date */}
+    </div>
+  ))
+) : (
+  <p style={styles.noPlaylists}>
+    {searchTerm
+      ? "No playlists match your search."
+      : "You haven't created any playlists yet."}
+  </p>
       )}
     </div>
   );
