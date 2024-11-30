@@ -11,7 +11,12 @@ import NewWelcomePage from "./components/NewWelcomePage";
 import Login from "./components/Login";
 import SearchPlaylist from "./components/SearchPlaylist";
 import SearchAlbum from "./components/SearchAlbum";
+
 import ProfileSettings from "./components/ProfileSettings";
+
+import ArtistRevenue from "./components/ArtistRevenue";
+import CreateAlbum from "./components/CreateAlbumMain";
+
 import Register from "./components/Register";
 
 function App()
@@ -32,6 +37,8 @@ function App()
         <Route path="/SearchPlaylist" element={<SearchPlaylist />} />
         <Route path="/SearchAlbum" element={<SearchAlbum />} />
         <Route path="/ProfileSettings" element={<ProfileSettings />} />
+        <Route path="/Revenue" element={<ArtistRevenue />} />
+        <Route path="/CreateAlbum" element={<CreateAlbum />} />
         <Route path="/register" element={<Register />} />
 
       </Routes>

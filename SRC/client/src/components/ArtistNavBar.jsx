@@ -58,7 +58,7 @@ const ArtistNavBar = () =>
             </div>
 
             <div style={navItemsStyle}>
-                <Link to="/login" style={linkStyle}>Revenue Generated</Link>
+                <Link to="/Revenue" style={linkStyle}>Revenue Generated</Link>
                 <Link to="/CreateAlbum" style={linkStyle}>Album</Link>
                 <Link to="/CreateSong" style={linkStyle}>Song</Link>
                 <Link to="/CreateEvent" style={linkStyle}>Event</Link>
