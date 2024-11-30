@@ -53,6 +53,11 @@ function Login()
 
                     localStorage.setItem('user', JSON.stringify(data.user));
 
+                    localStorage.setItem("UserID", JSON.stringify(data.user.UserID)); // Assuming your backend returns userID
+                    console.log(data.user.userID);
+                    localStorage.setItem("SubscriptionType", data.user.SubscriptionType); // No need for JSON.stringify
+                    console.log(data.user.SubscriptionType);
+
                     // Redirect to user welcome page
 
                     navigate('/UserWelcomePage');
@@ -85,7 +90,7 @@ function Login()
 
                     // Redirect to artist welcome page
 
-                    navigate('/ArtistWelcomePage');
+                    navigate('/Artist');
 
                 } else
                 {

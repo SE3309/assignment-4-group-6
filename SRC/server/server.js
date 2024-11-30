@@ -14,7 +14,7 @@ app.use(cors());
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",
-    password: "Omar824?",
+    password: "Rcgme03301!",
     database: "BRATmusic",
 });
 
@@ -918,9 +918,13 @@ app.get('/api/login', (req, res) => {
       if (results.length === 0) {
         return res.status(401).json({ error: 'Invalid UserID or Password.' });
       }
-  
+
       const user = results[0];
-  
+
+          // Debugging: Log the user object after it's assigned
+    console.log('User object:', user);
+
+      
       // Directly compare the passwords
       if (Password !== user.Password) {
         return res.status(401).json({ error: 'Invalid UserID or Password.' });
@@ -928,18 +932,24 @@ app.get('/api/login', (req, res) => {
   
       // Generate JWT
       const token = jwt.sign(
-        { UserID: user.UserID, DisplayName: user.DisplayName },
+        { UserID: user.UserID, DisplayName: user.DisplayName, SubscriptionType: user.SubscriptionType },
         JWT_SECRET
       );
   
       // Log the token in the terminal
       console.log('Generated JWT Token:', token);
+      console.log('User SubscriptionType:', user.SubscriptionType);
+
   
       // Send the token back to the client
       res.status(200).json({
         message: 'Login successful.',
         token: token,
-        user: { UserID: user.UserID, DisplayName: user.DisplayName }
+        user: { 
+        UserID: user.UserID, 
+        DisplayName: user.DisplayName, 
+        SubscriptionType: user.SubscriptionType // Ensure this is included
+    }
       });
     });
   });
@@ -1028,7 +1038,7 @@ app.get("/api/artist", (req, res) => {
 // Login API with JWT
 // Login API using GET (not recommended)
 app.get('/api/login', (req, res) => {
-   const { UserID, Password } = req.query; // Use query parameters for GET requests
+   const {UserID, Password} = req.query; // Use query parameters for GET requests
     // Input validation
    if (!UserID || !Password) {
      return res.status(400).json({ error: 'UserID and Password are required.' });
@@ -1049,6 +1059,7 @@ app.get('/api/login', (req, res) => {
      if (Password !== user.Password) {
        return res.status(401).json({ error: 'Invalid UserID or Password.' });
      }
+
       // Generate JWT
      const token = jwt.sign(
        { UserID: user.UserID, DisplayName: user.DisplayName },
