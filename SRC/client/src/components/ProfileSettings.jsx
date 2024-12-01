@@ -12,6 +12,9 @@ const ProfileSettings = () => {
   let [subscriptionType, setSubscriptionType] = useState("");
   let [startDate, setStartDate] = useState(""); // Start date of subscription
   let [userPlaylistID, setUserPlaylistID] = useState(""); // User Playlist ID
+  let [newSubscriptionType, setNewSubscriptionType] = useState(""); // For editing subscription type
+  const [isEditingSubscription, setIsEditingSubscription] = useState(false); // For the subscription edit modal state
+
 
 
   // Fetch user data from the API
@@ -38,9 +41,10 @@ const ProfileSettings = () => {
           if (data.user) {
             setUserData(data.user);
             setNewDisplayName(data.user.DisplayName);
-            setSubscriptionType(data.user.SubscriptionType);
+            setNewPassword(data.user.Password);
+            setNewSubscriptionType(data.user.SubscriptionType);
             setStartDate(data.user.StartDateOfSubscription);
-            setUserPlaylistID(data.user.UserPlaylistID);
+            setUserPlaylistID(data.user.PlaylistLibraryID);
           } else {
             throw new Error("User not found");
           }
@@ -55,18 +59,61 @@ const ProfileSettings = () => {
     fetchUserInfo();
   }, [cleanUserID]);
 
-  const saveChanges = () => {
-    // Logic for saving changes (API call to update user info)
-    console.log("Saving new display name:", newDisplayName);
-    console.log("Saving new password:", newPassword);
+ // Utility function to update a user field
+ const saveChanges = async (field) => {
+    let updatedData = {};
+    let apiUrl = '';
+    let bodyData = {};
 
-    // Update the state locally after saving
-    setUserData((prevData) => ({
-      ...prevData,
-      DisplayName: newDisplayName,
-    }));
+    switch (field) {
+      case "DisplayName":
+        updatedData.DisplayName = newDisplayName || userData.DisplayName;
+        apiUrl = `/api/userInfo/displayName/${userData.UserID}`;
+        bodyData = { DisplayName: updatedData.DisplayName };
+        break;
+      case "Password":
+        updatedData.Password = newPassword || userData.Password;
+        apiUrl = `/api/userInfo/password/${userData.UserID}`;
+        bodyData = { Password: updatedData.Password };
+        break;
+      case "SubscriptionType":
+        updatedData.SubscriptionType = newSubscriptionType || userData.SubscriptionType;
+        apiUrl = `/api/userInfo/subscriptionType/${userData.UserID}`;
+        bodyData = { SubscriptionType: updatedData.SubscriptionType };
+        break;
+      default:
+        alert("Invalid field");
+        return;
+    }
 
-    setIsEditing(false); // Close the edit modal
+    try {
+      // Sending PUT request to update user info in the database for the specific field
+      const response = await fetch(apiUrl, {
+        method: 'PUT', // HTTP method for update
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(bodyData),  // Dynamically set the field to be updated
+      });
+
+      // If the response is not okay, throw an error
+      if (!response.ok) {
+        const errorDetails = await response.json();
+        console.error("API Error:", errorDetails);
+        throw new Error(`Error: ${errorDetails.message || "Unknown error"}`);
+      } else {
+        const updatedUser = await response.json();
+        console.log("User info updated:", updatedUser);
+        alert("User info updated successfully!");
+      }
+
+      // Reset editing states for all fields after saving
+      setIsEditing(false);
+      setIsEditingSubscription(false);
+    } catch (error) {
+      console.error("Error saving user info:", error);
+      alert(`Error saving user information: ${error.message}`);
+    }
   };
 
   const styles = {
@@ -204,7 +251,7 @@ const ProfileSettings = () => {
           <h2 style={styles.sectionTitle}>Subscription Settings</h2>
           <div style={styles.field}>
             <label style={styles.fieldLabel}>Plan:</label>
-            <span style={styles.fieldValue}>{subscriptionType}</span>
+            <span style={styles.fieldValue}>{userData.SubscriptionType}</span>
           </div>
           <div style={styles.field}>
             <label style={styles.fieldLabel}>Start Date:</label>
@@ -214,14 +261,14 @@ const ProfileSettings = () => {
             <label style={styles.fieldLabel}>Playlist ID:</label>
             <span style={styles.fieldValue}>{userPlaylistID}</span>
           </div>
-          <button style={styles.button}>Edit</button>
+          <button style={styles.button} onClick={() => setIsEditingSubscription(true)}>Edit</button>
         </div>
       </div>
 
       {isEditing && (
   <div style={styles.modal}>
     <div style={styles.modalContent}>
-      <h3 style={styles.modalTitle}>Edit Profile</h3>
+      <h3 style={styles.label}>Edit Profile</h3>
       <label style={styles.label} htmlFor="displayName">Display Name:</label>
       <input
         type="text"
@@ -230,7 +277,8 @@ const ProfileSettings = () => {
         onChange={(e) => setNewDisplayName(e.target.value)}
         style={styles.inputField}
       />
-      <label style={styles.label} htmlFor="password">New Password:</label>
+      <button style={styles.button} onClick={() => saveChanges('DisplayName')}>Save Display Name</button><br></br>
+      <br></br><label style={styles.label} htmlFor="password">New Password:</label>
       <input
         type="password"
         id="password"
@@ -238,9 +286,7 @@ const ProfileSettings = () => {
         onChange={(e) => setNewPassword(e.target.value)}
         style={styles.inputField}
       />
-      <button style={styles.button} onClick={saveChanges}>
-        Save Changes
-      </button>
+      <button style={styles.button} onClick={() => saveChanges('Password')}>Save Password</button>
       <button
         style={{ ...styles.button, ...styles.buttonCancel }}
         onClick={() => setIsEditing(false)}
@@ -250,6 +296,31 @@ const ProfileSettings = () => {
     </div>
   </div>
 )}
+{/* Subscription Edit Modal */}
+    {isEditingSubscription && (
+        <div style={styles.modal}>
+          <div style={styles.modalContent}>
+            <h3 style={styles.label}>Edit Subscription Type</h3>
+            <label style={styles.label} htmlFor="subscriptionType">Subscription Type:</label>
+            <select
+              id="subscriptionType"
+              value={newSubscriptionType}
+              onChange={(e) => setNewSubscriptionType(e.target.value)}
+              style={styles.selectField}
+            >
+              <option value="free">Free</option>
+              <option value="premium">Premium</option>
+            </select>
+            <button style={styles.button} onClick={() => saveChanges('SubscriptionType')}>Save Subscription Type</button>
+            <button
+              style={{ ...styles.button, ...styles.buttonCancel }}
+              onClick={() => setIsEditingSubscription(false)}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
     </div>
   );

@@ -839,56 +839,171 @@ app.get('/api/userInfo/:email', (req, res) => {
 });
 
 //API to edit user info
-app.put('/api/userInfo/:email', (req, res) => {
+app.put('/api/userInfo/:email', (req, res) => { 
     const email = req.params.email;
     const { DisplayName, Password, SubscriptionType, StartDateOfSubscription, PlaylistLibraryID } = req.body;
-
+  
     // Validate required fields
     if (!DisplayName || !Password || !SubscriptionType) {
-        return res.status(400).json({ error: 'Missing required fields (DisplayName, Password, SubscriptionType).' });
+      return res.status(400).json({ error: 'Missing required fields (DisplayName, Password, SubscriptionType).' });
     }
-
-    // Query to update user details (make sure to match placeholders with parameters)
+  
+    // Prepare the query to update user details
     const query = `
-        UPDATE user 
-        SET 
-            DisplayName = ?, 
-            Password = ?, 
-            SubscriptionType = ?, 
-            StartDateOfSubscription = ?, 
-            PlaylistLibraryID = ? 
-        WHERE UserID = ?
+      UPDATE user 
+      SET 
+        DisplayName = ?, 
+        Password = ?, 
+        SubscriptionType = ?, 
+        StartDateOfSubscription = ?, 
+        PlaylistLibraryID = ? 
+      WHERE UserID = ?  -- Assuming the email is used as UserID
     `;
-
-
-    // Pass 6 values to match the 6 placeholders
+  
+    // Execute the query with the necessary parameters
     db.query(query, [DisplayName, Password, SubscriptionType, StartDateOfSubscription, PlaylistLibraryID, email], (err, result) => {
-        if (err) {
-            console.error('SQL Error:', err.message);
-            return res.status(500).json({ error: 'Failed to update user details.', details: err.message });
+      if (err) {
+        console.error('SQL Error:', err.message);
+        return res.status(500).json({ error: 'Failed to update user details.', details: err.message });
+      }
+  
+      // Check if any rows were affected (user found and updated)
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: 'User not found or no changes made.' });
+      }
+  
+      // Respond with the updated user info
+      res.status(200).json({
+        message: 'User details updated successfully.',
+        updatedUser: {
+          UserID: email,  // Assuming email is the unique identifier
+          DisplayName,
+          Password,
+          SubscriptionType,
+          StartDateOfSubscription,
+          PlaylistLibraryID
         }
-
-        // Check if user was found and updated
-        if (result.affectedRows === 0) {
-            return res.status(404).json({ message: 'User not found or no changes made.' });
-        }
-
-
-
-        // Respond with the updated user info
-        res.status(200).json({
-            message: 'User details updated successfully.',
-            updatedUser: {
-                UserID: email,  // Assuming email is the UserID or unique identifier
-                DisplayName,
-                Password,
-                SubscriptionType,
-                StartDateOfSubscription,
-                PlaylistLibraryID
-            }
-        });
+      });
     });
-});
+  });
+  
+app.put('/api/userInfo/displayName/:email', (req, res) => {
+    const email = req.params.email;
+    const { DisplayName } = req.body;
+  
+    // Validate that DisplayName is provided
+    if (!DisplayName) {
+      return res.status(400).json({ error: 'Missing required field: DisplayName' });
+    }
+  
+    // Query to update DisplayName
+    const query = `
+      UPDATE user 
+      SET DisplayName = ? 
+      WHERE UserID = ?
+    `;
+  
+    // Execute the query with the new DisplayName
+    db.query(query, [DisplayName, email], (err, result) => {
+      if (err) {
+        console.error('SQL Error:', err.message);
+        return res.status(500).json({ error: 'Failed to update DisplayName.', details: err.message });
+      }
+  
+      // Check if any rows were affected (user found and updated)
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: 'User not found or no changes made.' });
+      }
+  
+      // Respond with the updated DisplayName
+      res.status(200).json({
+        message: 'DisplayName updated successfully.',
+        updatedUser: {
+          UserID: email,
+          DisplayName
+        }
+      });
+    });
+  });
+    
+  app.put('/api/userInfo/password/:email', (req, res) => {
+    const email = req.params.email;
+    const { Password } = req.body;
+  
+    // Validate that Password is provided
+    if (!Password) {
+      return res.status(400).json({ error: 'Missing required field: Password' });
+    }
+  
+    // Query to update Password
+    const query = `
+      UPDATE user 
+      SET Password = ? 
+      WHERE UserID = ?
+    `;
+  
+    // Execute the query with the new Password
+    db.query(query, [Password, email], (err, result) => {
+      if (err) {
+        console.error('SQL Error:', err.message);
+        return res.status(500).json({ error: 'Failed to update Password.', details: err.message });
+      }
+  
+      // Check if any rows were affected (user found and updated)
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: 'User not found or no changes made.' });
+      }
+  
+      // Respond with the updated Password
+      res.status(200).json({
+        message: 'Password updated successfully.',
+        updatedUser: {
+          UserID: email,
+          Password
+        }
+      });
+    });
+  });
+  
+  app.put('/api/userInfo/subscriptionType/:email', (req, res) => {
+    const email = req.params.email;
+    const { SubscriptionType } = req.body;
+  
+    // Validate that SubscriptionType is provided
+    if (!SubscriptionType) {
+      return res.status(400).json({ error: 'Missing required field: SubscriptionType' });
+    }
+  
+    // Query to update SubscriptionType
+    const query = `
+      UPDATE user 
+      SET SubscriptionType = ? 
+      WHERE UserID = ?
+    `;
+  
+    // Execute the query with the new SubscriptionType
+    db.query(query, [SubscriptionType, email], (err, result) => {
+      if (err) {
+        console.error('SQL Error:', err.message);
+        return res.status(500).json({ error: 'Failed to update SubscriptionType.', details: err.message });
+      }
+  
+      // Check if any rows were affected (user found and updated)
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ message: 'User not found or no changes made.' });
+      }
+  
+      // Respond with the updated SubscriptionType
+      res.status(200).json({
+        message: 'SubscriptionType updated successfully.',
+        updatedUser: {
+          UserID: email,
+          SubscriptionType
+        }
+      });
+    });
+  });
+  
 
 
   
