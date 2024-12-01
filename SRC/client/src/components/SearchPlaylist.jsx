@@ -2,15 +2,17 @@ import React, { useState, useEffect } from "react";
 import backgroundImage from "../img/back.png";
 import UserHeader from './UserHeader';
 
-
 const SearchPlaylists = () => {
   const [playlists, setPlaylists] = useState([]);
+  const [songsByPlaylist, setSongsByPlaylist] = useState({}); // Added state to store songs for each playlist
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredPlaylists, setFilteredPlaylists] = useState([]);
   const [newPlaylist, setNewPlaylist] = useState({ description: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [inputValue, setInputValue] = useState("");
+  const [selectedPlaylistID, setSelectedPlaylistID] = useState(null);
+
 
   // Fetch playlists on component mount
   useEffect(() => {
@@ -55,12 +57,40 @@ const SearchPlaylists = () => {
 
       setPlaylists(data.playlists || []);
       setFilteredPlaylists(data.playlists || []);
+      
+      // Fetch songs for each playlist after fetching playlists
+      fetchSongsForPlaylists(data.playlists || []);
     } catch (error) {
       console.error("Error fetching playlists:", error);
     }
   };
-  
-  
+
+  // Fetch songs for each playlist
+  const fetchSongsForPlaylists = async (playlists) => {
+    const token = localStorage.getItem("token");
+    const songsData = {};
+
+    await Promise.all(
+      playlists.map(async (playlist) => {
+        try {
+          const response = await fetch(`/api/playlist-songs?playlistId=${playlist.PlaylistID}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            songsData[playlist.PlaylistID] = data.songs || [];
+          } else {
+            console.error(`Failed to fetch songs for playlist ${playlist.PlaylistID}`);
+          }
+        } catch (error) {
+          console.error(`Error fetching songs for playlist ${playlist.PlaylistID}:`, error);
+        }
+      })
+    );
+
+    setSongsByPlaylist(songsData); // Store the fetched songs data in state
+  };
 
   // Create a new playlist
   const handleCreatePlaylist = async () => {
@@ -107,10 +137,6 @@ const SearchPlaylists = () => {
       setIsLoading(false);
     }
   };
-  
-  
-  
-  
 
   // Filter playlists based on search term
   const filterPlaylists = () => {
@@ -122,6 +148,11 @@ const SearchPlaylists = () => {
       );
       setFilteredPlaylists(filtered);
     }
+  };
+
+  const handlePlaylistClick = (playlistID) => {
+    // Toggle the selected playlist
+    setSelectedPlaylistID((prevID) => (prevID === playlistID ? null : playlistID));
   };
 
   const styles = {
@@ -193,14 +224,19 @@ const SearchPlaylists = () => {
       borderRadius: "5px",
       flexDirection: "column",
       color: "white",
+      cursor: "pointer",
     },
     noPlaylists: {
       textAlign: "center",
       color: "#A1A1AA",
       marginTop: "20px",
     },
+    songItem: {
+      marginLeft: "20px",
+      fontSize: "1rem",
+    },
   };
-
+  
   return (
     <div style={styles.page}>
       <UserHeader />
@@ -208,8 +244,6 @@ const SearchPlaylists = () => {
 
       {/* Success Message */}
       {successMessage && <p style={styles.successMessage}>{successMessage}</p>}
-
-
 
       {/* Create New Playlist */}
       <div style={styles.newPlaylistContainer}>
@@ -239,23 +273,42 @@ const SearchPlaylists = () => {
 
       {/* Display Playlists */}
       {isLoading ? (
-  <p>Loading...</p>
-) : filteredPlaylists.length > 0 ? (
-  filteredPlaylists.map((playlist) => (
-    <div key={playlist.PlaylistID} style={styles.playlistItem}>
-      <h3>{playlist.Description || "Untitled Playlist"}</h3> {/* Use 'Description' for name */}
-      <p>Created: {new Date(playlist.DateAdded).toLocaleDateString()}</p> {/* Use 'DateAdded' for creation date */}
-    </div>
-  ))
-) : (
-  <p style={styles.noPlaylists}>
-    {searchTerm
-      ? "No playlists match your search."
-      : "You haven't created any playlists yet."}
-  </p>
+        <p>Loading...</p>
+      ) : filteredPlaylists.length > 0 ? (
+        filteredPlaylists.map((playlist) => (
+          <div
+            key={playlist.PlaylistID}
+            style={styles.playlistItem}
+            onClick={() => handlePlaylistClick(playlist.PlaylistID)}
+          >
+            <h3>{playlist.Description || "Untitled Playlist"}</h3>
+            <p>Created: {new Date(playlist.DateAdded).toLocaleDateString()}</p>
+            {/* Toggle display of songs */}
+            {selectedPlaylistID === playlist.PlaylistID && (
+              <div>
+                <h4>Songs:</h4>
+                {songsByPlaylist[playlist.PlaylistID] &&
+                songsByPlaylist[playlist.PlaylistID].length > 0 ? (
+                  songsByPlaylist[playlist.PlaylistID].map((song) => (
+                    <p key={song.MediaID} style={styles.songItem}>
+                      {song.mediaName} by {song.artistName}
+                    </p>
+                  ))
+                ) : (
+                  <p>No songs in this playlist.</p>
+                )}
+              </div>
+            )}
+          </div>
+        ))
+      ) : (
+        <p style={styles.noPlaylists}>
+          {searchTerm
+            ? "No playlists match your search."
+            : "You haven't created any playlists yet."}
+        </p>
       )}
     </div>
   );
 };
-
 export default SearchPlaylists;

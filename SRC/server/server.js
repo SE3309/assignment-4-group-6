@@ -428,6 +428,24 @@ app.get("/api/playlist-songs/:PlaylistID", (req, res) => {
     });
 });
 
+
+app.get('/api/playlist-songs', (req, res) => {
+    const playlistId = req.query.playlistId;
+  
+    if (!playlistId) {
+      return res.status(400).json({ error: "Playlist ID is required." });
+    }
+  
+    const query = `SELECT * FROM media WHERE MediaID IN (SELECT MediaID FROM playlist WHERE PlaylistID = ?)`;
+    db.query(query, [playlistId], (err, results) => {
+      if (err) {
+        console.error("SQL Error:", err);
+        return res.status(500).json({ error: "Failed to fetch songs for the playlist." });
+      }
+      res.status(200).json({ songs: results });
+    });
+  });
+  
 app.get("/api/stream/:MediaID", (req, res) => {
     const { MediaID } = req.params;
 
@@ -631,36 +649,48 @@ app.get("/api/search-song", (req, res) => {
         res.status(200).json({ message: "Songs retrieved successfully.", songs: results });
     });
 });
-
-app.post('/api/add-song-to-playlist', (req, res) => {
+app.post('/api/add-song-to-playlist', async (req, res) => {
     const { songId, playlistId } = req.body;
   
-    console.log("Request body:", req.body);
+    try {
+      // Ensure the playlist exists
+      const playlistQuery = "SELECT * FROM playlist WHERE PlaylistID = ?";
+      const [playlistRows] = await db.execute(playlistQuery, [playlistId]);
   
-    // Validate input
-    if (!songId || !playlistId) {
-      console.error("Missing songId or playlistId in request body.");
-      return res.status(400).json({ error: 'Song ID and Playlist ID are required.' });
+      if (playlistRows.length === 0) {
+        return res.status(404).send({ error: "Playlist not found" });
+      }
+  
+      // Get playlist details for the insert (if needed)
+      const playlistDescription = playlistRows[0].Description;
+      const playlistCreator = playlistRows[0].Creator;
+  
+      // Insert the song into the playlist
+      const insertQuery = `
+        INSERT INTO playlist (PlaylistID, MediaID, DateAdded, Description, Creator)
+        VALUES (?, ?, NOW(), ?, ?)
+      `;
+      await db.execute(insertQuery, [playlistId, songId, playlistDescription, playlistCreator]);
+  
+      res.status(200).send({ message: "Song added to playlist successfully" });
+    } catch (err) {
+      console.error("Error adding song to playlist:", err);
+      res.status(500).send({ error: "Failed to add song to playlist" });
     }
-  
-    // Update the MediaID in the specified playlist
-    const updatePlaylistQuery = `UPDATE playlist SET MediaID = ? WHERE PlaylistID = ?`;
-  
-    db.query(updatePlaylistQuery, [songId, playlistId], (err, result) => {
-      if (err) {
-        console.error("Database error while adding song to playlist:", err);
-        return res.status(500).json({ error: 'Internal server error while adding song to playlist.' });
-      }
-  
-      if (result.affectedRows === 0) {
-        console.error("Playlist not found or no changes made:", playlistId);
-        return res.status(404).json({ error: 'Playlist not found or no changes made.' });
-      }
-  
-      console.log("Song added to playlist successfully:", result);
-      res.status(200).json({ message: 'Song added to playlist successfully.' });
-    });
   });
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   
   
@@ -996,6 +1026,7 @@ app.get('/api/login', (req, res) => {
         JWT_SECRET
       );
   
+ 
       // Log the token in the terminal
       console.log('Generated JWT Token:', token);
   
@@ -1912,6 +1943,66 @@ app.get('/api/userPlaylists', (req, res) => {
       });
     });
   });
+  
+  app.post('/api/add-song-to-playlist', (req, res) => {
+    const { songId, playlistId, creatorId } = req.body;
+  
+    console.log("Request body:", req.body);
+  
+    // Validate input
+    if (!songId || !playlistId || !creatorId) {
+      console.error("Missing songId, playlistId, or creatorId in request body.");
+      return res.status(400).json({ error: 'Song ID, Playlist ID, and Creator ID are required.' });
+    }
+  
+    // Query to check if the song already exists in the playlist
+    const checkQuery = `
+      SELECT COUNT(*) AS countExists 
+      FROM playlist 
+      WHERE PlaylistID = ? AND MediaID = ?
+    `;
+    
+    db.query(checkQuery, [playlistId, songId], (err, result) => {
+      if (err) {
+        console.error("Database error while checking song existence:", err);
+        return res.status(500).json({ error: 'Error checking song existence in the playlist.' });
+      }
+  
+      if (result[0].countExists > 0) {
+        return res.status(400).json({ error: 'Song already exists in the playlist.' });
+      }
+  
+      // Query to add the song to the playlist
+      const insertQuery = `
+        INSERT INTO playlist (PlaylistID, MediaID, DateAdded, DateCreated, Creator) 
+        VALUES (?, ?, CURDATE(), NOW(), ?)
+      `;
+      
+      db.query(insertQuery, [playlistId, songId, creatorId], (err, insertResult) => {
+        if (err) {
+          console.error("Database error while adding song to playlist:", err);
+          return res.status(500).json({ error: 'Failed to add song to playlist.' });
+        }
+  
+        console.log("Song added to playlist successfully:", insertResult);
+        res.status(200).json({ message: 'Song added to playlist successfully.' });
+      });
+    });
+  });
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
   
     
     

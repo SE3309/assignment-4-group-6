@@ -66,6 +66,18 @@ const SearchSong = () => {
 
   const handleAddToPlaylist = async (songId, playlistId) => {
     try {
+      // First, check if the song already exists in the playlist
+      const checkResponse = await axios.get("/api/check-song-in-playlist", {
+        params: { songId, playlistId },
+      });
+  
+      // If the song already exists, notify the user and exit
+      if (checkResponse.data.exists) {
+        alert("This song is already in the playlist!");
+        return;
+      }
+  
+      // If the song doesn't exist, proceed with adding it to the playlist
       const response = await axios.post("/api/add-song-to-playlist", {
         songId,
         playlistId,
@@ -77,6 +89,8 @@ const SearchSong = () => {
       alert(err.response?.data?.error || "Failed to add song to playlist.");
     }
   };
+  
+  
   
 
   const styles = {
