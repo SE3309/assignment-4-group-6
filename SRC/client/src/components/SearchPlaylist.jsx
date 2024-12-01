@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from "react";
-import UserHeader from "./UserHeader";
 import backgroundImage from "../img/back.png";
+import UserHeader from './UserHeader';
 
 const SearchPlaylists = () => {
   const [playlists, setPlaylists] = useState([]);
+  const [songsByPlaylist, setSongsByPlaylist] = useState({}); // Added state to store songs for each playlist
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredPlaylists, setFilteredPlaylists] = useState([]);
   const [newPlaylist, setNewPlaylist] = useState({ description: "" });
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [inputValue, setInputValue] = useState("");
+  const [selectedPlaylistID, setSelectedPlaylistID] = useState(null);
+
 
   // Fetch playlists on component mount
   useEffect(() => {
@@ -24,47 +28,86 @@ const SearchPlaylists = () => {
   const fetchPlaylists = async () => {
     try {
       const token = localStorage.getItem("token");
-      const userId = "ellaharding"; // Replace with the actual user ID
-  
+      const storedUser = localStorage.getItem("user");
+
       if (!token) {
         throw new Error("No authentication token found");
       }
-  
+      if (!storedUser) {
+        throw new Error("No user information found in localStorage.");
+      }
+
+      const parsedUser = JSON.parse(storedUser);
+      const userId = parsedUser.UserID;
+
+      console.log("Fetching playlists for user:", userId);
+
       const response = await fetch(`/api/user-playlists?userId=${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
-  
+
       const data = await response.json();
+      console.log("Fetched playlists:", data);
+
       setPlaylists(data.playlists || []);
       setFilteredPlaylists(data.playlists || []);
+      
+      // Fetch songs for each playlist after fetching playlists
+      fetchSongsForPlaylists(data.playlists || []);
     } catch (error) {
       console.error("Error fetching playlists:", error);
     }
   };
-  
-  
-  
+
+  // Fetch songs for each playlist
+  const fetchSongsForPlaylists = async (playlists) => {
+    const token = localStorage.getItem("token");
+    const songsData = {};
+
+    await Promise.all(
+      playlists.map(async (playlist) => {
+        try {
+          const response = await fetch(`/api/playlist-songs?playlistId=${playlist.PlaylistID}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            songsData[playlist.PlaylistID] = data.songs || [];
+          } else {
+            console.error(`Failed to fetch songs for playlist ${playlist.PlaylistID}`);
+          }
+        } catch (error) {
+          console.error(`Error fetching songs for playlist ${playlist.PlaylistID}:`, error);
+        }
+      })
+    );
+
+    setSongsByPlaylist(songsData); // Store the fetched songs data in state
+  };
 
   // Create a new playlist
   const handleCreatePlaylist = async () => {
-    if (!newPlaylist.description) {
-      alert("Please provide a description for the playlist.");
+    if (!newPlaylist.name || !newPlaylist.description) {
+      alert("Please provide both a name and description for the playlist.");
       return;
     }
-
+  
     try {
       setIsLoading(true);
+  
       const token = localStorage.getItem("token");
+      const userId = localStorage.getItem("userId"); // Example: Fetch userId from local storage or a global state
       if (!token) {
         throw new Error("No authentication token found");
       }
-
+  
       const response = await fetch("/api/createPlaylist", {
         method: "POST",
         headers: {
@@ -72,23 +115,25 @@ const SearchPlaylists = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          userId: "ellaharding", // Replace with actual logged-in user ID
           description: newPlaylist.description,
+          mediaId: newPlaylist.mediaId || null, // Optional
         }),
       });
-
-      const data = await response.json();
-      if (response.ok) {
-        setSuccessMessage(data.message);
-        fetchPlaylists(); // Refresh the playlists after creation
-        setNewPlaylist({ description: "" }); // Clear the input
-        setTimeout(() => setSuccessMessage(""), 3000); // Clear success message after 3 seconds
-      } else {
-        alert(data.error || "Failed to create playlist.");
+  
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({})); // Catch invalid JSON
+        throw new Error(errorData.error || "Failed to create playlist");
       }
-      setIsLoading(false);
+  
+      const data = await response.json(); // Parse JSON response
+      setSuccessMessage(data.message);
+      fetchPlaylists(); // Refresh playlists after creation
+      setNewPlaylist({ name: "", description: "", mediaId: "" }); // Clear inputs
+      setTimeout(() => setSuccessMessage(""), 3000); // Clear success message after 3 seconds
     } catch (error) {
-      console.error("Error creating playlist:", error);
+      console.error("Error creating playlist:", error.message);
+      alert(error.message); // Show error message to the user
+    } finally {
       setIsLoading(false);
     }
   };
@@ -103,6 +148,11 @@ const SearchPlaylists = () => {
       );
       setFilteredPlaylists(filtered);
     }
+  };
+
+  const handlePlaylistClick = (playlistID) => {
+    // Toggle the selected playlist
+    setSelectedPlaylistID((prevID) => (prevID === playlistID ? null : playlistID));
   };
 
   const styles = {
@@ -174,14 +224,19 @@ const SearchPlaylists = () => {
       borderRadius: "5px",
       flexDirection: "column",
       color: "white",
+      cursor: "pointer",
     },
     noPlaylists: {
       textAlign: "center",
       color: "#A1A1AA",
       marginTop: "20px",
     },
+    songItem: {
+      marginLeft: "20px",
+      fontSize: "1rem",
+    },
   };
-
+  
   return (
     <div style={styles.page}>
       <UserHeader />
@@ -190,20 +245,18 @@ const SearchPlaylists = () => {
       {/* Success Message */}
       {successMessage && <p style={styles.successMessage}>{successMessage}</p>}
 
-      {/* Search Playlists */}
-      <div style={styles.searchContainer}>
-        <input
-          type="text"
-          placeholder="Search your playlists..."
-          style={styles.searchInput}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
-
       {/* Create New Playlist */}
       <div style={styles.newPlaylistContainer}>
         <h2>Create New Playlist</h2>
+        <input
+          type="text"
+          placeholder="Playlist Name"
+          style={styles.newPlaylistInput}
+          value={newPlaylist.name}
+          onChange={(e) =>
+            setNewPlaylist({ ...newPlaylist, name: e.target.value })
+          }
+        />
         <input
           type="text"
           placeholder="Playlist Description"
@@ -223,9 +276,29 @@ const SearchPlaylists = () => {
         <p>Loading...</p>
       ) : filteredPlaylists.length > 0 ? (
         filteredPlaylists.map((playlist) => (
-          <div key={playlist.PlaylistID} style={styles.playlistItem}>
-            <h3>{playlist.PlaylistName || "Untitled Playlist"}</h3>
-            <p>Created: {new Date(playlist.CreationDate).toLocaleDateString()}</p>
+          <div
+            key={playlist.PlaylistID}
+            style={styles.playlistItem}
+            onClick={() => handlePlaylistClick(playlist.PlaylistID)}
+          >
+            <h3>{playlist.Description || "Untitled Playlist"}</h3>
+            <p>Created: {new Date(playlist.DateAdded).toLocaleDateString()}</p>
+            {/* Toggle display of songs */}
+            {selectedPlaylistID === playlist.PlaylistID && (
+              <div>
+                <h4>Songs:</h4>
+                {songsByPlaylist[playlist.PlaylistID] &&
+                songsByPlaylist[playlist.PlaylistID].length > 0 ? (
+                  songsByPlaylist[playlist.PlaylistID].map((song) => (
+                    <p key={song.MediaID} style={styles.songItem}>
+                      {song.mediaName} by {song.artistName}
+                    </p>
+                  ))
+                ) : (
+                  <p>No songs in this playlist.</p>
+                )}
+              </div>
+            )}
           </div>
         ))
       ) : (
@@ -238,5 +311,4 @@ const SearchPlaylists = () => {
     </div>
   );
 };
-
 export default SearchPlaylists;

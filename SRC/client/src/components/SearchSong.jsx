@@ -1,44 +1,60 @@
 import React, { useState, useEffect } from "react";
 import UserHeader from "./UserHeader";
-import axios from "axios"; // Ensure you're using the import syntax
+import axios from "axios";
 import backgroundImage from "../img/back.png";
 
 const SearchSong = () => {
   const [mediaName, setMediaName] = useState("");
-  const [artistName, setArtistName] = useState("");
-  const [albumID, setAlbumID] = useState("");
   const [songs, setSongs] = useState([]);
   const [allSongs, setAllSongs] = useState([]);
   const [error, setError] = useState("");
+  const [playlists, setPlaylists] = useState([]);
+  const [selectedPlaylist, setSelectedPlaylist] = useState("");
 
+  // Fetch all songs and user's playlists on component mount
   useEffect(() => {
-    const fetchAllSongs = async () => {
-      try {
-        const response = await axios.get("/api/search-song"); // No need for full URL
-        console.log("Fetched all songs:", response.data);
-        setAllSongs(response.data.songs || []);
-      } catch (err) {
-        console.error("Error fetching all songs:", err);
-        setError("Unable to fetch all songs at the moment.");
-      }
-    };
-    
-
     fetchAllSongs();
+    fetchPlaylists();
   }, []);
+
+  const fetchAllSongs = async () => {
+    try {
+      const response = await axios.get("/api/search-song");
+      setAllSongs(response.data.songs || []);
+    } catch (err) {
+      console.error("Error fetching all songs:", err);
+      setError("Unable to fetch all songs at the moment.");
+    }
+  };
+
+  const fetchPlaylists = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const storedUser = localStorage.getItem("user");
+
+      if (!token || !storedUser) {
+        throw new Error("Missing authentication data");
+      }
+
+      const parsedUser = JSON.parse(storedUser);
+      const userId = parsedUser.UserID;
+
+      const response = await axios.get(`/api/user-playlists?userId=${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setPlaylists(response.data.playlists || []);
+    } catch (err) {
+      console.error("Error fetching playlists:", err);
+      setError("Unable to fetch playlists at the moment.");
+    }
+  };
 
   const handleSearch = async (e) => {
     e.preventDefault();
-
     try {
       const response = await axios.get("/api/search-song", {
-        params: {
-          mediaName,
-          artistName,
-          albumID,
-        },
+        params: { mediaName },
       });
-
       setSongs(response.data.songs || []);
       setError("");
     } catch (err) {
@@ -47,6 +63,35 @@ const SearchSong = () => {
       setSongs([]);
     }
   };
+
+  const handleAddToPlaylist = async (songId, playlistId) => {
+    try {
+      // First, check if the song already exists in the playlist
+      const checkResponse = await axios.get("/api/check-song-in-playlist", {
+        params: { songId, playlistId },
+      });
+  
+      // If the song already exists, notify the user and exit
+      if (checkResponse.data.exists) {
+        alert("This song is already in the playlist!");
+        return;
+      }
+  
+      // If the song doesn't exist, proceed with adding it to the playlist
+      const response = await axios.post("/api/add-song-to-playlist", {
+        songId,
+        playlistId,
+      });
+  
+      alert(response.data.message); // Show success message
+    } catch (err) {
+      console.error("Error adding song to playlist:", err);
+      alert(err.response?.data?.error || "Failed to add song to playlist.");
+    }
+  };
+  
+  
+  
 
   const styles = {
     page: {
@@ -103,6 +148,17 @@ const SearchSong = () => {
       fontWeight: "bold",
       marginBottom: "10px",
     },
+    dropdown: {
+      margin: "10px 0",
+    },
+    addButton: {
+      backgroundColor: "#4CAF50",
+      color: "white",
+      padding: "5px 10px",
+      border: "none",
+      borderRadius: "5px",
+      cursor: "pointer",
+    },
     errorMessage: {
       color: "red",
       marginTop: "10px",
@@ -142,17 +198,27 @@ const SearchSong = () => {
                   <strong>Artist:</strong> {song.artistName}
                 </p>
                 <p>
-                  <strong>Album ID:</strong> {song.albumID}
-                </p>
-                <p>
                   <strong>Length:</strong> {song.lengthOfMedia}
                 </p>
-                <p>
-                  <strong>Ranking:</strong> {song.mediaRanking}
-                </p>
-                <p>
-                  <strong>Date Created:</strong> {new Date(song.dateCreated).toLocaleDateString()}
-                </p>
+                <select
+                  style={styles.dropdown}
+                  value={selectedPlaylist}
+                  onChange={(e) => setSelectedPlaylist(e.target.value)}
+                >
+                  <option value="">Select a playlist</option>
+                  {playlists.map((playlist) => (
+                    <option key={playlist.PlaylistID} value={playlist.PlaylistID}>
+                      {playlist.Description}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  style={styles.addButton}
+                  onClick={() => handleAddToPlaylist(song.mediaID, selectedPlaylist)}
+                  disabled={!selectedPlaylist}
+                >
+                  Add to Playlist
+                </button>
                 <hr />
               </div>
             ))}
@@ -173,17 +239,27 @@ const SearchSong = () => {
                 <strong>Artist:</strong> {song.artistName}
               </p>
               <p>
-                <strong>Album ID:</strong> {song.albumID}
-              </p>
-              <p>
                 <strong>Length:</strong> {song.lengthOfMedia}
               </p>
-              <p>
-                <strong>Ranking:</strong> {song.mediaRanking}
-              </p>
-              <p>
-                <strong>Date Created:</strong> {new Date(song.dateCreated).toLocaleDateString()}
-              </p>
+              <select
+                style={styles.dropdown}
+                value={selectedPlaylist}
+                onChange={(e) => setSelectedPlaylist(e.target.value)}
+              >
+                <option value="">Select a playlist</option>
+                {playlists.map((playlist) => (
+                  <option key={playlist.PlaylistID} value={playlist.PlaylistID}>
+                    {playlist.Description}
+                  </option>
+                ))}
+              </select>
+              <button
+                style={styles.addButton}
+                onClick={() => handleAddToPlaylist(song.mediaID, selectedPlaylist)}
+                disabled={!selectedPlaylist}
+              >
+                Add to Playlist
+              </button>
               <hr />
             </div>
           ))
