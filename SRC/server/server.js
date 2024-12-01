@@ -838,6 +838,61 @@ app.get('/api/userInfo/:email', (req, res) => {
   });
 });
 
+//API to edit user info
+app.put('/api/userInfo/:email', (req, res) => {
+    const email = req.params.email;
+    const { DisplayName, Password, SubscriptionType, StartDateOfSubscription, PlaylistLibraryID } = req.body;
+
+    // Validate required fields
+    if (!DisplayName || !Password || !SubscriptionType) {
+        return res.status(400).json({ error: 'Missing required fields (DisplayName, Password, SubscriptionType).' });
+    }
+
+    // Query to update user details (make sure to match placeholders with parameters)
+    const query = `
+        UPDATE user 
+        SET 
+            DisplayName = ?, 
+            Password = ?, 
+            SubscriptionType = ?, 
+            StartDateOfSubscription = ?, 
+            PlaylistLibraryID = ? 
+        WHERE UserID = ?
+    `;
+
+
+    // Pass 6 values to match the 6 placeholders
+    db.query(query, [DisplayName, Password, SubscriptionType, StartDateOfSubscription, PlaylistLibraryID, email], (err, result) => {
+        if (err) {
+            console.error('SQL Error:', err.message);
+            return res.status(500).json({ error: 'Failed to update user details.', details: err.message });
+        }
+
+        // Check if user was found and updated
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'User not found or no changes made.' });
+        }
+
+
+
+        // Respond with the updated user info
+        res.status(200).json({
+            message: 'User details updated successfully.',
+            updatedUser: {
+                UserID: email,  // Assuming email is the UserID or unique identifier
+                DisplayName,
+                Password,
+                SubscriptionType,
+                StartDateOfSubscription,
+                PlaylistLibraryID
+            }
+        });
+    });
+});
+
+
+  
+
 app.get('/api/artistInfo/:artistName', (req, res) => {
   const artistName = req.params.artistName; // Assume this comes from the logged-in artist's session
 

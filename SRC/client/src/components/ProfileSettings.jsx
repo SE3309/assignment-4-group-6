@@ -6,13 +6,13 @@ const ProfileSettings = () => {
   const [userData, setUserData] = useState(null); // To store user data
   const [isEditing, setIsEditing] = useState(false); // For the edit modal state
   const [newDisplayName, setNewDisplayName] = useState(""); // For editing display name
+  const [newPassword, setNewPassword] = useState(""); // For editing password
   const [userID, setUserID] = useState(null);
   let [cleanUserID, setCleanedUserID] = useState(null); // State to hold parsed UserID
   let [subscriptionType, setSubscriptionType] = useState("");
+  let [startDate, setStartDate] = useState(""); // Start date of subscription
+  let [userPlaylistID, setUserPlaylistID] = useState(""); // User Playlist ID
 
-
-  //const UserID = localStorage.getItem("user.email");
-  // Replace this with the dynamic email of the logged-in user
 
   // Fetch user data from the API
   useEffect(() => {
@@ -23,11 +23,9 @@ const ProfileSettings = () => {
             cleanUserID = storedUserID.replace(/^"|"$/g, '');
             setCleanedUserID(cleanUserID);  // Set parsed UserID to state
             console.log(cleanUserID); // Your UserID
-
         } else {
           console.log("UserID not found in localStorage.");
         }    
-        
 
         try {
           const response = await fetch(`/api/userInfo/${cleanUserID}`);
@@ -41,6 +39,8 @@ const ProfileSettings = () => {
             setUserData(data.user);
             setNewDisplayName(data.user.DisplayName);
             setSubscriptionType(data.user.SubscriptionType);
+            setStartDate(data.user.StartDateOfSubscription);
+            setUserPlaylistID(data.user.UserPlaylistID);
           } else {
             throw new Error("User not found");
           }
@@ -51,12 +51,14 @@ const ProfileSettings = () => {
       };
       
 
+
     fetchUserInfo();
   }, [cleanUserID]);
 
   const saveChanges = () => {
     // Logic for saving changes (API call to update user info)
     console.log("Saving new display name:", newDisplayName);
+    console.log("Saving new password:", newPassword);
 
     // Update the state locally after saving
     setUserData((prevData) => ({
@@ -94,39 +96,55 @@ const ProfileSettings = () => {
     },
     section: {
       flex: "1",
-      maxWidth: "400px",
+      maxWidth: "500px",
       padding: "20px",
       backgroundColor: "rgba(43, 43, 43, 0.8)",
       borderRadius: "8px",
+      marginBottom: "20px",
     },
     sectionTitle: {
-      fontSize: "18px",
+      fontSize: "22px",
       fontWeight: "bold",
       marginBottom: "15px",
       color: "white",
     },
     field: {
-      marginBottom: "10px",
-      fontSize: "14px",
+      marginBottom: "15px",
+      fontSize: "16px",
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
     },
     fieldLabel: {
       color: "#ccc",
-      marginBottom: "5px",
-      display: "block",
+      fontWeight: "bold",
+      marginRight: "10px",
     },
     fieldValue: {
       color: "#1ed760",
       fontWeight: "bold",
     },
-    editButton: {
-      marginTop: "10px",
-      padding: "10px 20px",
+    inputField: {
+      width: "92%",
+      padding: "10px",
+      margin: "10px 0",
+      borderRadius: "5px",
+      border: "1px solid #ccc",
+    },
+    button: {
+      padding: "12px 20px",
       backgroundColor: "#1ed760",
       color: "#000",
       fontWeight: "bold",
       border: "none",
       borderRadius: "5px",
       cursor: "pointer",
+      width: "100%",
+    },
+    buttonCancel: {
+      backgroundColor: "red",
+      color: "white",
+      marginTop: "10px",
     },
     modal: {
       position: "fixed",
@@ -146,6 +164,11 @@ const ProfileSettings = () => {
       width: "300px",
       textAlign: "center",
     },
+    label: {
+        color: "black",
+        width: "96.5%",
+
+    },
   };
 
   if (!userData) {
@@ -156,63 +179,78 @@ const ProfileSettings = () => {
     <div style={styles.container}>
       <UserHeader />
       <div style={styles.content}>
+        {/* Display Name Section */}
         <div style={styles.section}>
-          <h2 style={styles.sectionTitle}>profile settings</h2>
+          <h2 style={styles.sectionTitle}>Profile Settings</h2>
           <div style={styles.field}>
-            <label style={styles.fieldLabel}>display name</label>
+            <label style={styles.fieldLabel}>Display Name:</label>
             <span style={styles.fieldValue}>{userData.DisplayName}</span>
           </div>
           <div style={styles.field}>
-            <label style={styles.fieldLabel}>email</label>
+            <label style={styles.fieldLabel}>Email:</label>
             <span style={styles.fieldValue}>{cleanUserID}</span>
           </div>
           <div style={styles.field}>
-            <label style={styles.fieldLabel}>password</label>
+            <label style={styles.fieldLabel}>Password:</label>
             <span style={styles.fieldValue}>********</span>
           </div>
-          <button style={styles.editButton} onClick={() => setIsEditing(true)}>
-            EDIT
+          <button style={styles.button} onClick={() => setIsEditing(true)}>
+            Edit
           </button>
         </div>
 
+        {/* Subscription Section */}
         <div style={styles.section}>
-          <h2 style={styles.sectionTitle}>subscription settings</h2>
+          <h2 style={styles.sectionTitle}>Subscription Settings</h2>
           <div style={styles.field}>
-            <label style={styles.fieldLabel}>your plan</label>
+            <label style={styles.fieldLabel}>Plan:</label>
             <span style={styles.fieldValue}>{subscriptionType}</span>
           </div>
-          <button style={styles.editButton}>upgrade</button>
+          <div style={styles.field}>
+            <label style={styles.fieldLabel}>Start Date:</label>
+            <span style={styles.fieldValue}>{startDate}</span>
+          </div>
+          <div style={styles.field}>
+            <label style={styles.fieldLabel}>Playlist ID:</label>
+            <span style={styles.fieldValue}>{userPlaylistID}</span>
+          </div>
+          <button style={styles.button}>Edit</button>
         </div>
       </div>
 
       {isEditing && (
-        <div style={styles.modal}>
-          <div style={styles.modalContent}>
-            <h3>Edit Profile Settings</h3>
-            <label htmlFor="displayName">Display Name:</label>
-            <input
-              type="text"
-              id="displayName"
-              value={newDisplayName}
-              onChange={(e) => setNewDisplayName(e.target.value)}
-              style={{ width: "100%", margin: "10px 0", padding: "5px" }}
-            />
-            <button style={styles.editButton} onClick={saveChanges}>
-              Save
-            </button>
-            <button
-              style={{
-                ...styles.editButton,
-                backgroundColor: "red",
-                color: "white",
-              }}
-              onClick={() => setIsEditing(false)}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+  <div style={styles.modal}>
+    <div style={styles.modalContent}>
+      <h3 style={styles.modalTitle}>Edit Profile</h3>
+      <label style={styles.label} htmlFor="displayName">Display Name:</label>
+      <input
+        type="text"
+        id="displayName"
+        value={newDisplayName}
+        onChange={(e) => setNewDisplayName(e.target.value)}
+        style={styles.inputField}
+      />
+      <label style={styles.label} htmlFor="password">New Password:</label>
+      <input
+        type="password"
+        id="password"
+        value={newPassword}
+        onChange={(e) => setNewPassword(e.target.value)}
+        style={styles.inputField}
+      />
+      <button style={styles.button} onClick={saveChanges}>
+        Save Changes
+      </button>
+      <button
+        style={{ ...styles.button, ...styles.buttonCancel }}
+        onClick={() => setIsEditing(false)}
+      >
+        Cancel
+      </button>
+    </div>
+  </div>
+)}
+
     </div>
   );
 };
