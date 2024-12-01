@@ -632,6 +632,39 @@ app.get("/api/search-song", (req, res) => {
     });
 });
 
+app.post('/api/add-song-to-playlist', (req, res) => {
+    const { songId, playlistId } = req.body;
+  
+    console.log("Request body:", req.body);
+  
+    // Validate input
+    if (!songId || !playlistId) {
+      console.error("Missing songId or playlistId in request body.");
+      return res.status(400).json({ error: 'Song ID and Playlist ID are required.' });
+    }
+  
+    // Update the MediaID in the specified playlist
+    const updatePlaylistQuery = `UPDATE playlist SET MediaID = ? WHERE PlaylistID = ?`;
+  
+    db.query(updatePlaylistQuery, [songId, playlistId], (err, result) => {
+      if (err) {
+        console.error("Database error while adding song to playlist:", err);
+        return res.status(500).json({ error: 'Internal server error while adding song to playlist.' });
+      }
+  
+      if (result.affectedRows === 0) {
+        console.error("Playlist not found or no changes made:", playlistId);
+        return res.status(404).json({ error: 'Playlist not found or no changes made.' });
+      }
+  
+      console.log("Song added to playlist successfully:", result);
+      res.status(200).json({ message: 'Song added to playlist successfully.' });
+    });
+  });
+  
+  
+  
+
   
 app.get('/api/user-playlists', (req, res) => {
     const userId = req.query.userId;

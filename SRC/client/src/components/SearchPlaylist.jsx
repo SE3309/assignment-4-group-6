@@ -209,16 +209,7 @@ const SearchPlaylists = () => {
       {/* Success Message */}
       {successMessage && <p style={styles.successMessage}>{successMessage}</p>}
 
-      {/* Search Playlists */}
-      <div style={styles.searchContainer}>
-        <input
-          type="text"
-          placeholder="Search your playlists..."
-          style={styles.searchInput}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-      </div>
+
 
       {/* Create New Playlist */}
       <div style={styles.newPlaylistContainer}>
